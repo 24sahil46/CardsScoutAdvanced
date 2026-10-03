@@ -1,0 +1,14 @@
+# Environment & Secrets
+api.env
+.env
+*.env
+
+# Local Database
+*.db
+cardscout.db
+
+# Python Cache & System files
+__pycache__/
+*/__pycache__/
+*.pyc
+.DS_Store

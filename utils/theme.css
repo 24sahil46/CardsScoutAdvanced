@@ -1,0 +1,263 @@
+/* Import modern font (Inter) to match the sleek UI */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* 1. Main Background: Deep Cinematic Blue */
+[data-testid="stAppViewContainer"] {
+    background: radial-gradient(circle at 50% 50%, #0d3256 0%, #041221 60%, #010408 100%) !important;
+    font-family: 'Inter', sans-serif !important;
+    color: #E2E8F0;
+}
+
+[data-testid="stHeader"] {
+    background: rgba(0,0,0,0) !important;
+}
+
+.stApp {
+    background-color: #010408 !important;
+}
+
+/* 2. Global Text Colors */
+h1, h2, h3, h4, h5, p, label, [data-testid="stWidgetLabel"] p {
+    color: #F8FAFC !important; 
+    font-family: 'Inter', sans-serif !important;
+}
+
+.material-symbols-rounded, .material-icons {
+    font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+    font-weight: normal !important;
+}
+
+/* 3. The Cards (Containers) */
+div[data-testid="stVerticalBlockBorderWrapper"] > div,
+.st-emotion-cache-1r6slb0, .st-emotion-cache-eqffof {
+    background-color: rgba(23, 31, 50, 0.4) !important;
+    backdrop-filter: blur(12px);
+    border: 6px solid rgba(255, 255, 255, 0.3) !important; 
+    border-radius: 16px !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8) !important; 
+}
+
+/* 4. Sidebar Customization */
+[data-testid="stSidebar"] {
+    background-color: #0b0f19 !important;
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+/* 5. Primary Buttons */
+button[kind="primary"] {
+    background-color: #171f32 !important; 
+    color: #F8FAFC !important; 
+    border: 1px solid #3b82f6 !important; 
+    border-radius: 24px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease;
+}
+
+button[kind="primary"] p, button[kind="primary"] span {
+    color: #F8FAFC !important; 
+}
+
+button[kind="primary"]:hover {
+    background-color: #1e293b !important;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3) !important;
+}
+
+[data-testid="stNumberInputStepDown"], 
+[data-testid="stNumberInputStepUp"] {
+    background-color: #171f32 !important; 
+    color: #F8FAFC !important;
+}
+
+[data-testid="stNumberInputStepDown"] svg, 
+[data-testid="stNumberInputStepUp"] svg {
+    fill: #F8FAFC !important;
+}
+
+/* 6. Secondary Buttons */
+button[kind="secondary"] {
+    background-color: #171f32 !important;
+    color: #F8FAFC !important;
+    border: 1px solid #2a354d !important;
+    border-radius: 24px !important;
+    transition: all 0.3s ease;
+}
+button[kind="secondary"]:hover {
+    background-color: #1e293b !important;
+    border-color: #3b82f6 !important;
+}
+
+/* 7. UNIFIED INPUTS & BORDERS */
+div[data-baseweb="input"] > div, 
+div[data-baseweb="select"] > div {
+    background-color: #171f32 !important; 
+    border: 1px solid #4a5568 !important; 
+    border-radius: 8px !important;
+    box-shadow: none !important; 
+}
+
+div[data-baseweb="input"] input {
+    background-color: transparent !important; 
+    color: #F8FAFC !important; 
+}
+
+div[data-baseweb="input"] input::placeholder {
+    color: #F8FAFC !important; 
+    opacity: 0.6 !important; 
+}
+
+[data-testid="stNumberInputStepDown"], 
+[data-testid="stNumberInputStepUp"] {
+    background-color: #171f32 !important; 
+    color: #F8FAFC !important;
+    border: 1px solid #4a5568 !important; 
+    border-radius: 8px !important;
+}
+
+[data-testid="stNumberInputStepDown"]:hover, 
+[data-testid="stNumberInputStepUp"]:hover {
+    background-color: #2a354d !important;
+    border: 1px solid #3b82f6 !important; 
+}
+
+div[data-baseweb="select"] div, 
+div[data-baseweb="select"] span {
+    color: #F8FAFC !important;
+}
+div[data-baseweb="select"] > div {
+    background-color: #171f32 !important;
+}
+div[data-baseweb="select"] svg {
+    fill: #F8FAFC !important;
+}
+
+div[data-baseweb="popover"] > div, 
+div[data-baseweb="popover"] > div > div,
+ul[data-baseweb="menu"],
+ul[role="listbox"] {
+    background-color: #171f32 !important; 
+    border-radius: 8px !important;
+}
+
+li[role="option"] {
+    background-color: #171f32 !important;
+    color: #F8FAFC !important;
+}
+
+li[role="option"]:hover, 
+li[role="option"][aria-selected="true"],
+li[role="option"]:focus {
+    background-color: #2a354d !important;
+    color: #FFFFFF !important;
+}
+
+span[data-baseweb="tag"] {
+    background-color: #2a354d !important;
+    color: #F8FAFC !important;
+    border: 1px solid #3b82f6 !important; 
+}
+span[data-baseweb="tag"] span, 
+span[data-baseweb="tag"] svg {
+    color: #F8FAFC !important;
+    fill: #F8FAFC !important;
+}
+
+/* 8. Info Box & Accents */
+[data-testid="stInfo"] {
+    background-color: rgba(6, 182, 212, 0.1) !important;
+    border-left-color: #06B6D4 !important; 
+}
+[data-testid="stInfo"] p {
+    color: #06B6D4 !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #10B981 !important; 
+}
+
+/* 9. STATUS & LOADING WIDGETS */
+[data-testid="stStatusWidget"] > div, 
+[data-testid="stExpander"] {
+    background-color: #171f32 !important; 
+    border: 1px solid #4a5568 !important; 
+    border-radius: 8px !important;
+}
+
+[data-testid="stStatusWidget"] summary,
+[data-testid="stStatusWidget"] summary p,
+[data-testid="stStatusWidget"] summary span,
+[data-testid="stStatusWidget"] div[data-testid="stText"],
+[data-testid="stExpander"] summary p,
+[data-testid="stExpander"] summary span {
+    color: #F8FAFC !important;
+}
+
+[data-testid="stStatusWidget"] [data-testid="stSpinner"] circle {
+    stroke: #06B6D4 !important; 
+}
+
+/* 10. DIALOG & POPUP FIX */
+div[data-testid="stDialog"] div[role="dialog"] {
+    background-color: #0b121e !important; 
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #F8FAFC !important;
+}
+
+div[data-testid="stDialog"] .stMarkdown, 
+div[data-testid="stDialog"] .stMarkdown p, 
+div[data-testid="stDialog"] .stMarkdown span,
+div[data-testid="stDialog"] .stMarkdown li,
+div[data-testid="stDialog"] h1, 
+div[data-testid="stDialog"] h2, 
+div[data-testid="stDialog"] h3 {
+    color: #FFFFFF !important;
+    opacity: 1 !important; 
+    -webkit-text-fill-color: #FFFFFF !important;
+}
+
+div[data-testid="stDialog"] table {
+    background-color: #171f32 !important;
+    color: #F8FAFC !important;
+    border: 1px solid #4a5568 !important;
+    border-radius: 8px !important;
+}
+
+div[data-testid="stDialog"] th {
+    background-color: #1e293b !important;
+    color: #06B6D4 !important; 
+}
+
+div[data-testid="stDialog"] [data-testid="stVerticalBlock"] {
+    background-color: transparent !important;
+}
+
+/* 11. TABLE ENHANCEMENTS */
+table th {
+    color: #06B6D4 !important; 
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: rgba(6, 182, 212, 0.05) !important; 
+    border-bottom: 2px solid #06B6D4 !important; 
+}
+
+table td {
+    color: #F8FAFC !important;
+    font-size: 0.95rem !important;
+    opacity: 1 !important;
+}
+
+div[data-testid="status_bar"] {
+    background-color: #0b121e !important;
+    border: 1px solid rgba(6, 182, 212, 0.3) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+div[data-testid="status_bar"] svg {
+    fill: #06B6D4 !important;
+}
+
+div[data-testid="status_bar"] div {
+    color: #ffffff !important;
+}
