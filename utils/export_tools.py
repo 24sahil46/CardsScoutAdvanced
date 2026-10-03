@@ -96,12 +96,14 @@ def render_markdown_table(pdf, table_rows):
                 pdf.multi_cell(0, 4.5, " | ".join(specs))
             pdf.ln(1.5)
 
+
 def generate_pdf_report(user_name, report_text):
     """
     Renders an executive-formatted PDF report with structured tables and bullets.
     """
     try:
         clean_name = sanitize_for_pdf(user_name)
+        # Apply the sanitizer correctly to the incoming report_text
         clean_text = sanitize_for_pdf(report_text)
         
         pdf = FPDF(orientation="P", unit="mm", format="A4")
@@ -201,6 +203,7 @@ def generate_pdf_report(user_name, report_text):
             return bytes(fallback_pdf.output())
         except Exception:
             return None
+
 
 def get_share_links(user_profile_type, deployment_url="https://24-sahil-cardscoutai.hf.space"):
     share_text = f"Check out my Credit Card Finder on CardScout AI! Profile: {user_profile_type}. App: {deployment_url}"
