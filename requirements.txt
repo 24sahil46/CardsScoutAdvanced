@@ -3,3 +3,4 @@ pandas
 google-generativeai
 tavily-python
 python-dotenv
+fpdf
