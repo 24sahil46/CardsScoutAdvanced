@@ -49,9 +49,12 @@ def generate_card_roadmap(user_data):
             User Profile: {user_data}
             Recent Web Data: {web_data}
 
-            Provide a "Top 5 Podium Recommendations" list optimized for this user. 
-            CRITICAL FORMATTING INSTRUCTION: For the Top 5 Podium Recommendations, strictly use a standard clean numbered list (1., 2., 3., 4., 5.). Do NOT use markdown tables, ASCII boxes, vertical pipes (|), or borders. 
-            Format the rest of your response clearly using standard markdown.
+            Please provide a comprehensive financial roadmap structured into these specific sections:
+
+            1. Top 5 Podium Recommendations: First, create a clean Markdown table (using | and -) to visually summarize the recommended cards. Below the table, provide a detailed numbered list explaining the rewards and why each card fits this user.
+            2. Step-by-Step Action Plan: At the very bottom, provide a clear, actionable list of key steps the user must follow to achieve their credit and financial goals.
+
+            Format your entire response clearly using standard markdown.
             """
             
             # 3. Call active model
