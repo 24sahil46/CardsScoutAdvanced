@@ -45,12 +45,13 @@ def generate_card_roadmap(user_data):
             
             # 2. Formulate Prompt
             prompt = f"""
-            Act as an Expert Financial Advisor. 
+            Act as an Expert Financial Advisor.
             User Profile: {user_data}
             Recent Web Data: {web_data}
-            
-            Provide a "Top 5 Podium Recommendations" list optimized for this user.
-            Format your response clearly using markdown.
+
+            Provide a "Top 5 Podium Recommendations" list optimized for this user. 
+            CRITICAL FORMATTING INSTRUCTION: For the Top 5 Podium Recommendations, strictly use a standard clean numbered list (1., 2., 3., 4., 5.). Do NOT use markdown tables, ASCII boxes, vertical pipes (|), or borders. 
+            Format the rest of your response clearly using standard markdown.
             """
             
             # 3. Call active model
