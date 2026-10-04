@@ -261,3 +261,13 @@ div[data-testid="status_bar"] svg {
 div[data-testid="status_bar"] div {
     color: #ffffff !important;
 }
+
+/* Hide the floating Streamlit toolbar that overlaps text */
+[data-testid="stElementToolbar"] {
+    display: none !important;
+}
+
+/* Add a small padding to chat messages just to be safe */
+[data-testid="stChatMessageContent"] {
+    padding-right: 20px !important;
+}
