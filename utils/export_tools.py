@@ -218,7 +218,7 @@ def generate_pdf_report(user_name, report_text):
             return None
 
 
-def get_share_links(user_profile_type, deployment_url="https://24-sahil-cardscoutai.hf.space"):
+def get_share_links(user_profile_type, deployment_url="https://cardscout-advanced.streamlit.app/"):
     share_text = f"Check out my Credit Card Finder on CardScout AI! Profile: {user_profile_type}. App: {deployment_url}"
     whatsapp_url = f"https://wa.me/?text={urllib.parse.quote(share_text)}"
     mail_subject = urllib.parse.quote("My CardScout AI Financial Roadmap")
