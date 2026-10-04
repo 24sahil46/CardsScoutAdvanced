@@ -146,7 +146,7 @@ app_mode = st.sidebar.radio(
 
 # 4. Global Sidebar Co-Pilot
 st.sidebar.markdown("---")
-with st.sidebar.expander("💬 Co-Pilot: Swipe or Hold?", expanded=False):
+with st.sidebar.expander("💬 Ask CardScout AI: Swipe or Hold?", expanded=False):
     st.caption("Ask quick purchase questions (e.g., 'Spending ₹4,500 on Swiggy')")
 
     if not st.session_state.get('logged_in', False):
