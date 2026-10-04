@@ -4,3 +4,4 @@ google-generativeai
 tavily-python
 python-dotenv
 fpdf
+psycopg2-binary

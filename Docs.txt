@@ -20,3 +20,5 @@ Over-limit Penalty: Percentage charges on balance breaches.
 AI Risk Advisory: A bottom alert highlighting the card's single most dangerous penalty clause.
 
 Tab 6: 💎 Reward Point Conversion Matrix (The "Arbitrage Engine")The Problem: Banks intentionally disguise point values behind abstract currencies (e.g., "You earned 20,000 Reward Points!"). An average user redeems them for statement credit or generic toaster ovens at ₹0.20/point, completely unaware that transferring them to airline or hotel partners gives ₹0.80 to ₹1.00/point.The Experience:Inputs: Select card + enter your current Point Balance (e.g., 25,000 points).Dynamic Multi-Scenario Output:Statement Credit / Cash: e.g., ₹0.20/pt $\rightarrow$ ₹5,000Brand Vouchers (Amazon/Flipkart): e.g., ₹0.35/pt $\rightarrow$ ₹8,750Travel / Airline / Hotel Transfer: e.g., ₹1.00/pt $\rightarrow$ ₹25,000Arbitrage Callout: A highlight card showing "Value Left On The Table: ₹20,000 (5x difference)" with the AI's exact recommendation on where to transfer the points.
+
+ Postgres database
