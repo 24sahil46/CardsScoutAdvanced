@@ -200,7 +200,8 @@ def generate_pdf_report(user_name, report_text):
             render_markdown_table(pdf, table_buffer)
             table_buffer = []
 
-        return bytes(pdf.output())
+        # МӘҢГЕЛЕК КАРАР:
+        return pdf.output(dest="S").encode("latin-1", "replace")
 
     except Exception as e:
         print(f"PDF Generator Error: {e}")
@@ -210,7 +211,9 @@ def generate_pdf_report(user_name, report_text):
             fallback_pdf.add_page()
             fallback_pdf.set_font("helvetica", "", 10)
             fallback_pdf.multi_cell(0, 6, sanitize_for_pdf(report_text))
-            return bytes(fallback_pdf.output())
+            
+            # МӘҢГЕЛЕК КАРАР (Fallback өчен):
+            return fallback_pdf.output(dest="S").encode("latin-1", "replace")
         except Exception:
             return None
 
