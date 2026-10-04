@@ -94,7 +94,9 @@ def render_markdown_table(pdf, table_rows):
             title = f"{row[0]}. {row[1]}" if len(row) > 1 else row[0]
             pdf.set_font("helvetica", "B", 9)
             pdf.set_text_color(13, 50, 86)
-            pdf.cell(0, 5, title, new_x="LMARGIN", new_y="NEXT")
+            
+            # THE FIXED LINE:
+            pdf.cell(0, 5, title, ln=1)
             
             pdf.set_font("helvetica", "", 8.5)
             pdf.set_text_color(71, 85, 105)
