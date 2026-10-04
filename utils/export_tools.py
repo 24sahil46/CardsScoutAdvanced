@@ -11,17 +11,25 @@ def sanitize_for_pdf(text):
     if not text:
         return ""
     
-    # 1. Standardize Currencies & Typographical Marks
-    text = text.replace("₹", "Rs. ")
-    text = text.replace("•", "- ").replace("—", "-").replace("–", "-")
-    text = text.replace('“', '"').replace('”', '"').replace("‘", "'").replace("’", "'")
+    # Force convert known problem characters directly to ASCII equivalents
+    text = text.replace("₹", "Rs. ").replace('₹', 'Rs. ')
     
-    # 2. Safely remove markdown dividers and bold tags
+    # Handle smart quotes, bullet points, and dashes
+    replacements = {
+        "•": "-", "—": "-", "–": "-", 
+        '“': '"', '”': '"', "‘": "'", "’": "'",
+        "\u20B9": "Rs. ", "\u2022": "-", "\u2014": "-", "\u2013": "-"
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    
+    # Safely remove markdown dividers and bold tags
     text = re.sub(r'^[ \t]*[-*_]{3,}[ \t]*$', '', text, flags=re.MULTILINE)
     text = text.replace("**", "").replace("__", "")
     text = re.sub(r'#{1,6}\s*', '', text)
     
-    # 3. Strip Emojis & Characters Outside Latin-1 Range
+    # Strip ALL remaining characters outside the Latin-1 range
+    # Ignore errors so it just silently deletes any leftover emojis or weird symbols
     sanitized = text.encode("latin-1", "ignore").decode("latin-1")
     return sanitized
 
