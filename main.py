@@ -239,8 +239,8 @@ if st.session_state.current_page == "Home":
             <style>
             .hero-title-sleek {
                 font-family: 'Inter', -apple-system, sans-serif !important;
-                font-size: 5.1rem !important;
-                font-weight: 620 !important;
+                font-size: 3.7rem !important;
+                font-weight: 590 !important;
                 letter-spacing: -1px !important;
                 margin-bottom: 0 !important;
                 padding-bottom: 0 !important;
