@@ -1,4 +1,5 @@
 # core/ai_agent.py
+import os
 import json
 import re
 import streamlit as st
@@ -17,7 +18,12 @@ def get_gemini_model():
     """Configures and returns the Gemini model using the current active key."""
     global current_key_index
     active_key = KEY_POOL[current_key_index]
+    
+    # Force the SDK to recognize your custom key name by injecting it into the environment
+    os.environ["GEMINI_API_KEY"] = active_key
     genai.configure(api_key=active_key)
+    
+    # Restored to Gemini 3.8 Flash!
     return genai.GenerativeModel('gemini-3.8-flash')
 
 def rotate_key():
@@ -64,7 +70,7 @@ def generate_card_roadmap(user_data):
 
         except Exception as e:
             error_message = str(e)
-            if "429" in error_message or "Quota" in error_message:
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 rotated = rotate_key()
                 if rotated and attempts < max_attempts:
@@ -93,7 +99,7 @@ def generate_battle_analysis(entered_card, original_recommendation, user_data):
             return response.text
         except Exception as e:
             error_message = str(e)
-            if "429" in error_message or "Quota" in error_message:
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     continue
@@ -152,7 +158,7 @@ def get_forex_markup(card_name):
         except Exception as e:
             error_message = str(e)
             # If we hit a rate limit, rotate to the next API key
-            if "429" in error_message or "Quota" in error_message:
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
@@ -247,7 +253,7 @@ def fetch_live_card_offers(card_name):
             
         except Exception as e:
             error_message = str(e)
-            if "429" in error_message or "Quota" in error_message:
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
@@ -291,7 +297,7 @@ def get_hidden_milestones(card_name):
             
         except Exception as e:
             error_message = str(e)
-            if "429" in error_message or "Quota" in error_message:
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
@@ -331,7 +337,7 @@ def get_utility_cashback_rate(card_name, services):
             
         except Exception as e:
             error_message = str(e)
-            if "429" in error_message or "Quota" in error_message:
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
@@ -382,7 +388,7 @@ def get_reward_point_values(card_name):
             
         except Exception as e:
             error_message = str(e)
-            if "429" in error_message or "Quota" in error_message:
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
@@ -436,7 +442,7 @@ def get_fee_and_penalty_audit(card_name):
             
         except Exception as e:
             error_message = str(e)
-            if "429" in error_message or "Quota" in error_message:
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
