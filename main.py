@@ -148,7 +148,7 @@ nav_brand, nav_space, nav_home, nav_hub, nav_copilot = st.columns([3.5, 3.5, 1.2
 
 with nav_brand:
     st.markdown("""
-        <div style='display: flex; align-items: center; margin-top: -5px; cursor: default;'>
+        <div style='display: flex; align-items: center; height: 100%; margin-top: -12px; cursor: default;'>
             <h2 style='margin: 0; font-weight: 700; font-size: 1.7rem; letter-spacing: -0.5px; font-family: "Inter", sans-serif;'>
                 <span style='color: #FFFFFF;'>Card</span><span style='color: #34D399;'>Scout</span>
             </h2>
