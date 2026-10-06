@@ -709,7 +709,7 @@ def render_optimization_hub():
                 clean_title = auth_mode.replace('🟢', '').replace('✨', '').strip()
                 title_placeholder.markdown(f"<h3 style='text-align: center; color: #E2E8F0; margin-bottom: 25px;'>{clean_title}</h3>", unsafe_allow_html=True)
                 
-                username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., sahil_wealth", key="login_username")
+                username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., abc_24", key="login_username")
                 
                 st.markdown("🔑 **Security Clearance (Password)**")
                 
