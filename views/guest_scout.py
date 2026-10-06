@@ -57,54 +57,7 @@ def render_guest_scout():
 
         /* ----------------------------------------------------------- */
         
-        /* ----------------------------------------------------------- */
-        /* --- THE PERFECT INPUT FIELD FIX (SOLID POPPY THEME) --- */
         
-        /* 1. Use a SOLID, rich dark-green/black hex to completely bury the Cloud's grey */
-        div[data-baseweb="input"],
-        div[data-baseweb="select"] > div {
-            background-color: #08140F !important; /* Solid Dark Emerald/Black */
-            border: 1px solid #16382A !important; /* Dark Green Edge */
-            border-radius: 8px !important;
-            color: #FFFFFF !important;
-            transition: all 0.3s ease-in-out !important;
-        }
-
-        /* 2. Force the inner typing area to inherit the solid color */
-        div[data-baseweb="base-input"],
-        div[data-baseweb="base-input"] > input,
-        div[data-baseweb="base-input"] > textarea {
-            background-color: transparent !important;
-            color: #FFFFFF !important;
-        }
-
-        /* 3. Make them POP with a Neon Glow on hover and focus */
-        div[data-baseweb="input"]:hover,
-        div[data-baseweb="select"] > div:hover,
-        div[data-baseweb="input"]:focus-within {
-            background-color: #0C1E16 !important; /* Slightly lighter solid green-black */
-            border-color: #34D399 !important; /* Bright Neon Mint Border */
-            box-shadow: 0 0 12px rgba(52, 211, 153, 0.4) !important; /* Neon Glow */
-        }
-
-        /* 4. Number Input Plus/Minus Buttons */
-        [data-testid="stNumberInputStepDown"],
-        [data-testid="stNumberInputStepUp"] {
-            background-color: transparent !important;
-            color: #34D399 !important;
-        }
-
-        [data-testid="stNumberInputStepDown"]:hover,
-        [data-testid="stNumberInputStepUp"]:hover {
-            background-color: rgba(52, 211, 153, 0.2) !important;
-            color: #FFFFFF !important;
-        }
-        
-        /* 5. Dropdown Icons - make them Mint Green to match */
-        svg[data-baseweb="icon"] {
-            fill: #34D399 !important;
-        }
-        /* ----------------------------------------------------------- */
 
         /* ----------------------------------------------------------- */
         /* --- NATIVE BUTTON SIZING --- */

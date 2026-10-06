@@ -1,0 +1,14 @@
+[theme]
+# The main accent color (Your Mint Green)
+primaryColor = "#34D399"
+
+# The main background color (Your Dark App Background)
+backgroundColor = "#040D08"
+
+# THIS is what controls the Input Fields and Sidebar! (Solid Dark Emerald)
+secondaryBackgroundColor = "#08140F"
+
+# The main text color
+textColor = "#F8FAFC"
+
+font = "sans serif"
