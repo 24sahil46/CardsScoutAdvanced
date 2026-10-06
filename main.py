@@ -251,8 +251,9 @@ if st.session_state.current_page == "Home":
                 line-height: 1.1 !important;
                 text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6), 0px 0px 40px rgba(16, 185, 129, 0.2) !important;
             }
-            div.hero-subtitle-sleek {
+            .hero-subtitle-sleek {
                 font-family: 'Inter', -apple-system, sans-serif !important;
+                color: #D4AF37 !important; /* <--- FORCE METALLIC GOLD */
                 font-size: 1.05rem !important;
                 letter-spacing: 3px !important;
                 font-weight: 600 !important; 

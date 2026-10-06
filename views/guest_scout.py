@@ -26,7 +26,7 @@ def render_guest_scout():
         }
         .scout-subtitle {
             font-family: 'Inter', -apple-system, sans-serif !important;
-            color: #F8FAFC !important; 
+            color: #D4AF37 !important; 
             font-size: 0.95rem !important;
             letter-spacing: 3px !important;
             font-weight: 600 !important;
@@ -155,7 +155,7 @@ def render_guest_scout():
             background-color: #34D399 !important; 
             color: #040D08 !important; 
             border: none !important;
-            border-radius: 6px !important;
+            border-radius: 30px !important; /* Restored Pill Shape */
             height: 48px !important;
             font-weight: 700 !important;
             font-size: 1.05rem !important;
@@ -173,7 +173,7 @@ def render_guest_scout():
             background-color: rgba(255, 255, 255, 0.05) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             color: #FFFFFF !important;
-            border-radius: 6px !important;
+            border-radius: 30px !important; /* Restored Pill Shape */
             height: 48px !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
