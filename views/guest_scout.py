@@ -53,7 +53,15 @@ def render_guest_scout():
         /* 2. SOLID DARK INPUT FIELDS (Fixes Grey Cloud Override) */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
-        .stSelectbox > div > div > div,
+        /* This controls the outer wrapper of the dropdown */
+        .stSelectbox > div > div > div {
+            background-color: #08100C !important; 
+        }
+
+        /* This controls the inner clickable area of the dropdown */
+        div[data-baseweb="select"] > div {
+            background-color: #08100C !important;
+        }
         .stMultiSelect > div > div > div {
             background-color: #08100C !important; 
             background: #08100C !important;
