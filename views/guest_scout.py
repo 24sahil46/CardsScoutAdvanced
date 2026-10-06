@@ -24,7 +24,7 @@ def render_guest_scout():
         }
         .scout-subtitle {
             font-family: 'Inter', -apple-system, sans-serif !important;
-            color: #F8FAFC !important; 
+            color: #D4AF37 !important; 
             font-size: 0.95rem !important;
             letter-spacing: 3px !important;
             font-weight: 600 !important;
