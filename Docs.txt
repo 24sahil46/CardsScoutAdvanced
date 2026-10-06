@@ -23,6 +23,6 @@ Tab 6: 💎 Reward Point Conversion Matrix (The "Arbitrage Engine")The Problem: 
 
  Postgres database
 
- git add .
- git commit -m "Fixed panel"
- git push main
+git add .
+git commit -m "Fixed is panel"
+git push origin main

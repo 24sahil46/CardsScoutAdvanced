@@ -49,33 +49,47 @@ def render_guest_scout():
             font-size: 0.9rem !important;
         }
 
-        /* ----------------------------------------------------------- */
-        /* --- 2. INPUT FIELDS (Borderless Translucent Faint White) --- */
+       /* ----------------------------------------------------------- */
+        /* --- 2. INPUT FIELDS (Match "Add Other Category" Button) --- */
         
-        div[data-testid="stTextInput"] div[data-baseweb="input"] > div,
-        div[data-testid="stNumberInput"] div[data-baseweb="input"] > div,
-        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div,
-        div[data-testid="stMultiSelect"] div[data-baseweb="select"] > div {
-            background-color: rgba(255, 255, 255, 0.12) !important; 
+        /* 1. Apply the exact button background color to the outermost wrappers */
+        [data-testid="stTextInput"] div[data-baseweb="input"],
+        [data-testid="stNumberInput"] div[data-baseweb="input"],
+        [data-testid="stSelectbox"] div[data-baseweb="select"] > div,
+        [data-testid="stMultiSelect"] div[data-baseweb="select"] > div {
+            background-color: rgba(255, 255, 255, 0.1) !important; 
+            background: rgba(255, 255, 255, 0.1) !important; 
             border: none !important; 
-            border-radius: 4px !important; 
+            border-radius: 8px !important; 
             transition: background-color 0.2s ease !important;
         }
         
-        input[class^="st-"], input[class*=" st-"],
-        div[data-baseweb="base-input"] {
+        /* 2. The Nuclear Bleach: Destroy Streamlit's injected grey on all inner elements */
+        [data-testid="stTextInput"] div[data-baseweb="base-input"],
+        [data-testid="stNumberInput"] div[data-baseweb="base-input"],
+        [data-testid="stTextInput"] input,
+        [data-testid="stNumberInput"] input,
+        [data-testid="stSelectbox"] input,
+        [data-testid="stMultiSelect"] input {
             background-color: transparent !important;
+            background: transparent !important;
+            border: none !important;
             color: #FFFFFF !important;
-        }
-
-        div[data-testid="stTextInput"] div[data-baseweb="input"] > div:hover,
-        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div:hover,
-        div[data-testid="stTextInput"] div[data-baseweb="input"] > div:focus-within,
-        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div:focus-within {
-            background-color: rgba(255, 255, 255, 0.2) !important;
             box-shadow: none !important;
         }
 
+        /* 3. Hover and Focus */
+        [data-testid="stTextInput"] div[data-baseweb="input"]:hover,
+        [data-testid="stNumberInput"] div[data-baseweb="input"]:hover,
+        [data-testid="stSelectbox"] div[data-baseweb="select"] > div:hover,
+        [data-testid="stMultiSelect"] div[data-baseweb="select"] > div:hover,
+        [data-testid="stTextInput"] div[data-baseweb="input"]:focus-within,
+        [data-testid="stSelectbox"] div[data-baseweb="select"] > div:focus-within {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* 4. Fix Plus/Minus Buttons */
         [data-testid="stNumberInputStepDown"],
         [data-testid="stNumberInputStepUp"] {
             background-color: transparent !important;
@@ -87,9 +101,11 @@ def render_guest_scout():
             background-color: rgba(255, 255, 255, 0.1) !important;
         }
         
+        /* Dropdown Icon */
         svg[data-baseweb="icon"] { fill: #FFFFFF !important; }
-
         /* ----------------------------------------------------------- */
+
+
         /* --- 3. THE ACTION BUTTONS --- */
         
         button[kind="primary"], button[kind="secondary"] {
