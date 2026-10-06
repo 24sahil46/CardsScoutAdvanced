@@ -676,11 +676,15 @@ def render_optimization_hub():
     # IF NOT LOGGED IN: Show Login/Signup form
     # ==========================================
     else:
-        # 1. SILENT CSS TO NUKE THE BROKEN NATIVE 'VISIBILITY' TEXT FOREVER
+        # 1. ULTIMATE CSS TO NUKE THE 'VISIBILITY' TEXT FOREVER
         st.markdown("""
             <style>
-            [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child {
+            /* Targets ANYTHING in the input wrapper that is NOT the typing area and hides it */
+            [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) {
                 display: none !important;
+                color: transparent !important;
+                font-size: 0px !important;
+                width: 0px !important;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -707,20 +711,22 @@ def render_optimization_hub():
                 
                 username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., sahil_wealth", key="login_username")
                 
-                # --- ROCK SOLID PASSWORD TOGGLE ---
                 st.markdown("🔑 **Security Clearance (Password)**")
                 
-                # Custom Checkbox
-                show_password = st.checkbox("Show password", key="show_pwd_checkbox")
+                # Fetch checkbox state FIRST so the input knows whether to mask or show text
+                show_pwd = st.session_state.get("show_pwd_checkbox", False)
                 
-                # Dynamically switch type based on checkbox. The native eye icon is destroyed by the CSS above!
+                # Draw the password field ABOVE the checkbox
                 password = st.text_input(
                     "Password", 
-                    type="default" if show_password else "password", 
+                    type="default" if show_pwd else "password", 
                     placeholder="Enter your secret passcode", 
                     label_visibility="collapsed",
                     key="login_password_box"
                 )
+                
+                # Draw the checkbox BELOW the password field
+                st.checkbox("Show password", key="show_pwd_checkbox")
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 
