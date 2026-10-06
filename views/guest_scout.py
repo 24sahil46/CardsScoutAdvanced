@@ -56,17 +56,18 @@ def render_guest_scout():
         }
 
         /* ----------------------------------------------------------- */
-        /* --- THE PERFECT INPUT FIELD FIX (ULTIMATE CLOUD-PROOF) --- */
         
-        /* 1. The Outer Wrapper: Prefixing with Streamlit classes for max specificity */
+        /* --- THE PERFECT INPUT FIELD FIX (BLACK GLASS) --- */
+        
+        /* 1. The Outer Wrapper: Deep Black with Slight Transparency */
         .stTextInput div[data-baseweb="input"],
         .stSelectbox div[data-baseweb="select"] > div,
         .stMultiSelect div[data-baseweb="select"] > div,
         .stNumberInput div[data-baseweb="input"] {
-            background-color: rgba(10, 20, 15, 0.3) !important; 
-            background: rgba(10, 20, 15, 0.3) !important; /* Force override shorthand */
-            backdrop-filter: blur(12px) !important; 
-            -webkit-backdrop-filter: blur(12px) !important;
+            background-color: rgba(0, 0, 0, 0.6) !important; 
+            background: rgba(0, 0, 0, 0.6) !important; 
+            backdrop-filter: blur(10px) !important; 
+            -webkit-backdrop-filter: blur(10px) !important;
             border: 1px solid rgba(255, 255, 255, 0.15) !important;
             transition: all 0.3s ease !important;
         }
@@ -76,7 +77,7 @@ def render_guest_scout():
             border-radius: 8px !important; 
         }
         
-        /* Hover and Focus States */
+        /* Hover and Focus States: Darkens slightly and glows green */
         .stTextInput div[data-baseweb="input"]:hover,
         .stSelectbox div[data-baseweb="select"] > div:hover,
         .stMultiSelect div[data-baseweb="select"] > div:hover,
@@ -84,8 +85,8 @@ def render_guest_scout():
         .stTextInput div[data-baseweb="input"]:focus-within,
         .stNumberInput div[data-baseweb="input"]:focus-within {
             border-color: #34D399 !important; 
-            background-color: rgba(15, 22, 28, 0.6) !important;
-            background: rgba(15, 22, 28, 0.6) !important;
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            background: rgba(0, 0, 0, 0.8) !important;
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.3) !important;
         }
 
@@ -116,8 +117,8 @@ def render_guest_scout():
         [data-testid="stNumberInputStepDown"]:hover,
         [data-testid="stNumberInputStepUp"]:hover {
             color: #34D399 !important;
-            background-color: rgba(52, 211, 153, 0.15) !important;
-            background: rgba(52, 211, 153, 0.15) !important;
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            background: rgba(0, 0, 0, 0.4) !important;
         }
         /* ----------------------------------------------------------- */
 
