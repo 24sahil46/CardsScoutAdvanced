@@ -24,7 +24,7 @@ def render_guest_scout():
         }
         .scout-subtitle {
             font-family: 'Inter', -apple-system, sans-serif !important;
-            color: #D4AF37 !important; /* Metallic Gold */
+            color: #D4AF37 !important; 
             font-size: 0.95rem !important;
             letter-spacing: 3px !important;
             font-weight: 600 !important;
@@ -32,72 +32,102 @@ def render_guest_scout():
             text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.8) !important;
         }
 
-        /* MASTER GLASSMORPHISM CONTAINER */
+        /* 1. MASTER CONTAINER (Dark Frosted Glass Overlay) */
         [data-testid="stVerticalBlockBorderWrapper"] {
-            background: linear-gradient(145deg, rgba(10, 20, 15, 0.6), rgba(4, 13, 8, 0.8)) !important;
-            backdrop-filter: blur(12px) !important;
-            border: 1px solid rgba(52, 211, 153, 0.2) !important;
-            border-radius: 16px !important;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05) !important;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease !important;
-            padding: 10px !important;
-        }
-        [data-testid="stVerticalBlockBorderWrapper"]:hover {
-            border: 1px solid rgba(212, 175, 55, 0.4) !important;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(212, 175, 55, 0.15) !important;
+            background: rgba(0, 0, 0, 0.45) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 12px !important;
+            padding: 30px !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
         }
 
-        /* Gold tint for all input labels */
         label[data-testid="stWidgetLabel"] p {
-            color: #D4AF37 !important; 
-            font-weight: 600 !important;
-            letter-spacing: 0.5px !important;
-            font-size: 0.95rem !important;
+            color: #E2E8F0 !important; 
+            font-weight: 500 !important;
+            font-size: 0.9rem !important;
         }
 
         /* ----------------------------------------------------------- */
+        /* --- 2. INPUT FIELDS (Borderless Translucent Faint White) --- */
         
+        div[data-testid="stTextInput"] div[data-baseweb="input"] > div,
+        div[data-testid="stNumberInput"] div[data-baseweb="input"] > div,
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div,
+        div[data-testid="stMultiSelect"] div[data-baseweb="select"] > div {
+            background-color: rgba(255, 255, 255, 0.12) !important; 
+            border: none !important; 
+            border-radius: 4px !important; 
+            transition: background-color 0.2s ease !important;
+        }
         
-
-        /* ----------------------------------------------------------- */
-        /* --- NATIVE BUTTON SIZING --- */
-        
-        button[kind="secondary"], button[kind="primary"] {
-            border-radius: 30px !important;
-            font-weight: 600 !important;
-            transition: all 0.3s ease !important;
+        input[class^="st-"], input[class*=" st-"],
+        div[data-baseweb="base-input"] {
+            background-color: transparent !important;
+            color: #FFFFFF !important;
         }
 
-        /* Secondary Buttons (Top Nav, Add Category, Edit Profile) */
+        div[data-testid="stTextInput"] div[data-baseweb="input"] > div:hover,
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div:hover,
+        div[data-testid="stTextInput"] div[data-baseweb="input"] > div:focus-within,
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div:focus-within {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            box-shadow: none !important;
+        }
+
+        [data-testid="stNumberInputStepDown"],
+        [data-testid="stNumberInputStepUp"] {
+            background-color: transparent !important;
+            color: #FFFFFF !important;
+            border: none !important;
+        }
+        [data-testid="stNumberInputStepDown"]:hover,
+        [data-testid="stNumberInputStepUp"]:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        svg[data-baseweb="icon"] { fill: #FFFFFF !important; }
+
+        /* ----------------------------------------------------------- */
+        /* --- 3. THE ACTION BUTTONS --- */
+        
+        button[kind="primary"], button[kind="secondary"] {
+            transition: all 0.2s ease !important;
+            font-weight: 700 !important;
+        }
+
+        button[kind="primary"] {
+            background-color: #34D399 !important; 
+            color: #040D08 !important; 
+            border: none !important;
+            border-radius: 4px !important;
+            height: 48px !important;
+            font-size: 1.05rem !important;
+            box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2) !important;
+        }
+        
+        button[kind="primary"]:hover {
+            background-color: #2bb381 !important; 
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(52, 211, 153, 0.4) !important;
+            color: #000000 !important;
+        }
+        
         button[kind="secondary"] {
-            background: rgba(4, 13, 8, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            color: #F8FAFC !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border: none !important;
+            color: #FFFFFF !important;
+            border-radius: 30px !important;
         }
         button[kind="secondary"]:hover {
-            border-color: #D4AF37 !important;
-            background: rgba(212, 175, 55, 0.15) !important;
+            background-color: rgba(255, 255, 255, 0.2) !important;
             color: #FFFFFF !important;
-        }
-
-        /* Primary Buttons (Next Step, Back, Battle Now) */
-        button[kind="primary"] {
-            background: #08100C !important; 
-            border: 1px solid #D4AF37 !important; 
-            color: #F8FAFC !important;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1) !important;
-        }
-        button[kind="primary"]:hover {
-            border-color: #F2D249 !important;
-            background: #111A15 !important;
-            color: #FFFFFF !important;
-            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25) !important;
         }
 
         /* ----------------------------------------------------------- */
-        /* --- DASHBOARD INTELLIGENCE HUB STYLING --- */
+        /* --- 4. DASHBOARD INTELLIGENCE HUB STYLING --- */
 
-        /* Glassmorphism for the Loading Status Box */
         [data-testid="stStatusWidget"] {
             background: linear-gradient(145deg, rgba(10, 20, 15, 0.6), rgba(4, 13, 8, 0.8)) !important;
             backdrop-filter: blur(12px) !important;
@@ -106,7 +136,6 @@ def render_guest_scout():
             box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important;
         }
         
-        /* Force inner layers of the status box to be transparent */
         [data-testid="stStatusWidget"] details,
         [data-testid="stStatusWidget"] summary {
             background-color: transparent !important;
@@ -118,7 +147,6 @@ def render_guest_scout():
             background-color: rgba(52, 211, 153, 0.1) !important;
         }
 
-        /* Error Box Styling */
         [data-testid="stNotification"] {
             background-color: rgba(220, 38, 38, 0.15) !important;
             backdrop-filter: blur(6px) !important;
@@ -127,13 +155,11 @@ def render_guest_scout():
             border-radius: 8px !important;
         }
 
-        /* Metric Numbers Styling */
         [data-testid="stMetricValue"] {
             color: #F8FAFC !important;
             font-weight: 800 !important;
         }
 
-        /* Neon Multiselect tags */
         span[data-baseweb="tag"] {
             background-color: rgba(52, 211, 153, 0.15) !important;
             color: #34D399 !important;
@@ -413,7 +439,7 @@ def render_guest_scout():
                 odds, status, color = ("35%", "Challenging", "inverse") if score == "< 700" else ("85%", "Strong", "normal")
                 st.metric(label="Likelihood for Top Pick", value=odds, delta=status, delta_color=color)
 
-        @st.dialog("⚔️ Card Battle: Peer-to-Peer Analysis", width="large")
+        @st.dialog("⚔️️ Card Battle: Peer-to-Peer Analysis", width="large")
         def battle_popup(entered_card, original_recommendation, user_context):
             st.write(f"### 🏆 Our Top Pick vs. {entered_card}")
             with st.spinner("Analyzing battle metrics..."):
