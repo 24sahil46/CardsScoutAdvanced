@@ -76,7 +76,7 @@ def render_guest_scout():
             background-color: #08100C !important;
             background: #08100C !important;
             color: #FFFFFF !important;
-            border: none !important;
+            border: 1px solid rgba(52, 211, 153, 0.3) !important;
         }
 
         /* Fix the React Portals (Dropdown Menus) */
