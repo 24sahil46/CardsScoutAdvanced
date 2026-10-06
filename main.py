@@ -15,7 +15,7 @@ st.markdown("""
     
     /* 2. Pull the entire main container flush to the top */
     .block-container {
-        padding-top: 2rem !important; /* Change to 1rem if you want it even higher! */
+        padding-top: 2rem !important; 
     }
     </style>
 """, unsafe_allow_html=True)
@@ -51,11 +51,9 @@ def set_main_background():
                 background-size: cover !important;
                 background-position: center center !important;
                 background-repeat: no-repeat !important;
-                /* Applies the light blur and drops brightness slightly so cards pop */
                 filter: blur(6px) brightness(0.85); 
-                /* Scales up slightly to hide blurry transparent edges around the monitor */
                 transform: scale(1.03); 
-                z-index: -1; /* Pushes this layer firmly behind your app content */
+                z-index: -1; 
             }}
             /* Forces Streamlit's default background containers to be completely transparent */
             [data-testid="stAppViewContainer"], [data-testid="stHeader"], .stApp {{
@@ -64,7 +62,7 @@ def set_main_background():
             </style>
         """, unsafe_allow_html=True)
     else:
-        st.error(f"⚠️️ Background image '{bg_file}' not found! Please ensure it is renamed correctly.")
+        st.error(f"⚠️ Background image '{bg_file}' not found! Please ensure it is renamed correctly.")
 
 set_main_background()
 
@@ -130,19 +128,21 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- DYNAMIC ACTIVE PAGE HIGHLIGHT ---
+# --- DYNAMIC ACTIVE PAGE HIGHLIGHT (FIXED SPECIFICITY) ---
 active_css = ""
-if st.session_state.current_page == "Home":
-    active_css = "div[data-testid='column']:nth-child(3) button"
+# Keeps Home highlighted even if you are inside the Guest Scout form
+if st.session_state.current_page in ["Home", "Guest Scout"]:
+    active_css = "body div[data-testid='column']:nth-child(3) button"
 elif st.session_state.current_page == "Optimization Hub":
-    active_css = "div[data-testid='column']:nth-child(4) button"
+    active_css = "body div[data-testid='column']:nth-child(4) button"
     
 if active_css:
     st.markdown(f"""
         <style>
+        /* Increased specificity to ensure active state ALWAYS overrides base state */
         {active_css} {{
             background-color: rgba(52, 211, 153, 0.15) !important;
-            border-color: #34D399 !important;
+            border: 1px solid #34D399 !important;
             color: #34D399 !important;
             box-shadow: 0 0 10px rgba(52, 211, 153, 0.2) !important;
         }}
@@ -165,7 +165,7 @@ with nav_home:
         st.rerun()
 
 with nav_hub:
-    hub_label = "Vault" if st.session_state.get('logged_in', False) else "Vault"
+    hub_label = "Vault" 
     if st.button(hub_label, use_container_width=True):
         st.session_state.current_page = "Optimization Hub"
         st.rerun()
@@ -211,7 +211,6 @@ if st.session_state.current_page == "Home":
             padding-bottom: 1rem !important;
         }
 
-        /* Universally targets primary buttons so it never fails on different screens */
         button[kind="primary"] {
             border-radius: 30px !important;
             background-color: rgba(4, 13, 8, 0.95) !important;
@@ -254,10 +253,10 @@ if st.session_state.current_page == "Home":
             }
             .hero-subtitle-sleek {
                 font-family: 'Inter', -apple-system, sans-serif !important;
-                color: #D4AF37 !important; /* Premium Metallic Gold */
+                color: #D4AF37 !important; 
                 font-size: 1.05rem !important;
                 letter-spacing: 3px !important;
-                font-weight: 600 !important; /* Bumped up slightly to make the gold stand out */
+                font-weight: 600 !important; 
                 margin-top: 5px !important;
                 text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.8) !important;
             }
