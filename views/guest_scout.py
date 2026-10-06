@@ -65,8 +65,8 @@ def render_guest_scout():
         .stTextInput input,
         .stNumberInput input,
         [data-baseweb="base-input"] {
-            background-color: transparent !important;
-            background: transparent !important;
+            background-color: #08100C !important;
+            background: #08100C !important;
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important;
         }
