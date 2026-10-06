@@ -58,47 +58,42 @@ def render_guest_scout():
         /* ----------------------------------------------------------- */
         
         /* ----------------------------------------------------------- */
-        /* --- THE PERFECT INPUT FIELD FIX (BLACK GLASS) --- */
+        /* --- THE PERFECT INPUT FIELD FIX (ULTIMATE BLACK GLASS) --- */
         
-        /* 1. The Outer Wrapper: Deep Black with Slight Transparency */
-        .stTextInput div[data-baseweb="input"],
-        .stSelectbox div[data-baseweb="select"] > div,
-        .stMultiSelect div[data-baseweb="select"] > div,
-        .stNumberInput div[data-baseweb="input"] {
+        /* 1. Target the outermost data-testid wrappers to absolutely override the Cloud Theme */
+        [data-testid="stTextInput"] div[data-baseweb="input"],
+        [data-testid="stNumberInput"] div[data-baseweb="input"],
+        [data-testid="stSelectbox"] div[data-baseweb="select"] > div,
+        [data-testid="stMultiSelect"] div[data-baseweb="select"] > div {
             background-color: rgba(0, 0, 0, 0.6) !important; 
             background: rgba(0, 0, 0, 0.6) !important; 
             backdrop-filter: blur(10px) !important; 
             -webkit-backdrop-filter: blur(10px) !important;
             border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 8px !important;
             transition: all 0.3s ease !important;
         }
         
-        .stSelectbox div[data-baseweb="select"] > div,
-        .stMultiSelect div[data-baseweb="select"] > div { 
-            border-radius: 8px !important; 
-        }
-        
-        /* Hover and Focus States: Darkens slightly and glows green */
-        .stTextInput div[data-baseweb="input"]:hover,
-        .stSelectbox div[data-baseweb="select"] > div:hover,
-        .stMultiSelect div[data-baseweb="select"] > div:hover,
-        .stNumberInput div[data-baseweb="input"]:hover,
-        .stTextInput div[data-baseweb="input"]:focus-within,
-        .stNumberInput div[data-baseweb="input"]:focus-within {
+        /* 2. Hover and Focus States */
+        [data-testid="stTextInput"] div[data-baseweb="input"]:hover,
+        [data-testid="stNumberInput"] div[data-baseweb="input"]:hover,
+        [data-testid="stSelectbox"] div[data-baseweb="select"] > div:hover,
+        [data-testid="stMultiSelect"] div[data-baseweb="select"] > div:hover,
+        [data-testid="stTextInput"] div[data-baseweb="input"]:focus-within,
+        [data-testid="stNumberInput"] div[data-baseweb="input"]:focus-within {
             border-color: #34D399 !important; 
             background-color: rgba(0, 0, 0, 0.8) !important;
             background: rgba(0, 0, 0, 0.8) !important;
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.3) !important;
         }
 
-        /* 2. Force deepest inner elements completely transparent */
-        div[data-baseweb="base-input"],
-        div[data-baseweb="base-input"] > input,
-        div[data-baseweb="base-input"] > textarea,
-        .stTextInput input,
-        .stNumberInput input,
-        .stSelectbox input,
-        .stMultiSelect input {
+        /* 3. Strip ALL default grey backgrounds from inner text elements */
+        [data-testid="stTextInput"] div[data-baseweb="base-input"],
+        [data-testid="stNumberInput"] div[data-baseweb="base-input"],
+        [data-testid="stTextInput"] input,
+        [data-testid="stNumberInput"] input,
+        [data-testid="stSelectbox"] input,
+        [data-testid="stMultiSelect"] input {
             background-color: transparent !important;
             background: transparent !important;
             border: none !important;
@@ -106,7 +101,7 @@ def render_guest_scout():
             box-shadow: none !important;
         }
 
-        /* 3. Number Input Plus/Minus Buttons */
+        /* 4. Number Input Plus/Minus Buttons */
         [data-testid="stNumberInputStepDown"],
         [data-testid="stNumberInputStepUp"] {
             background-color: transparent !important;
