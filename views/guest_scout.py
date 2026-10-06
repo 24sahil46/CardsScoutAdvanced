@@ -71,6 +71,14 @@ def render_guest_scout():
             -webkit-text-fill-color: #FFFFFF !important;
         }
 
+        /* Target the internal selectbox inputs to match the wrapper */
+        div[data-baseweb="select"] > div {
+            background-color: #08100C !important;
+            background: #08100C !important;
+            color: #FFFFFF !important;
+            border: none !important;
+        }
+
         /* Fix the React Portals (Dropdown Menus) */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
@@ -407,7 +415,7 @@ def render_guest_scout():
                 st.divider()
                 col_back, col_space, col_next = st.columns([3, 4, 3])
                 
-                if col_back.button("Back", type="secondary", use_container_width=True):
+                if col_back.button("Back", type="primary", use_container_width=True):
                     st.session_state.step = 1
                     st.rerun()
                     
