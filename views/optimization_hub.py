@@ -27,8 +27,8 @@ def render_optimization_hub():
     # --- VAULT MASTER THEME INJECTION ---
     st.markdown("""
         <style>
-        /* Sleek Typography */
-        .scout-title {
+        /* ISOLATED VAULT TYPOGRAPHY (Fixes CSS Bleed) */
+        .vault-title {
             font-family: 'Inter', -apple-system, sans-serif !important;
             font-size: 3.2rem !important;
             font-weight: 700 !important;
@@ -36,11 +36,12 @@ def render_optimization_hub():
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
             line-height: 1.1 !important;
+            color: #FFFFFF !important;
             text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6), 0px 0px 40px rgba(52, 211, 153, 0.2) !important;
         }
-        .scout-subtitle {
+        .vault-subtitle {
             font-family: 'Inter', -apple-system, sans-serif !important;
-            color: #F8FAFC !important; 
+            color: #D4AF37 !important; /* Perfect Gold Match */
             font-size: 0.95rem !important;
             letter-spacing: 3px !important;
             font-weight: 600 !important;
@@ -60,7 +61,7 @@ def render_optimization_hub():
             box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
         }
 
-        /* 2. SOLID DARK INPUT FIELDS */
+        /* 2. SOLID DARK INPUT FIELDS (Fixes Grey Cloud Override) */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
         .stSelectbox > div > div > div,
@@ -76,13 +77,16 @@ def render_optimization_hub():
         .stNumberInput input,
         [data-baseweb="base-input"] {
             background-color: transparent !important;
+            background: transparent !important;
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important;
         }
 
+        /* Fix the React Portals (Dropdown Menus) */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
             background-color: #08100C !important; 
+            background: #08100C !important;
             border: 1px solid rgba(52, 211, 153, 0.3) !important;
             border-radius: 8px !important;
         }
@@ -178,7 +182,7 @@ def render_optimization_hub():
             background-color: transparent !important;
         }
         [data-testid="stExpander"] summary p {
-            color: #34D399 !important; /* Exact match to your mint theme */
+            color: #34D399 !important; 
             font-weight: 700 !important;
             font-size: 1.05rem !important;
             visibility: visible !important;
@@ -247,11 +251,10 @@ def render_optimization_hub():
         
         st.markdown("""
             <div style="text-align: center; margin-bottom: 30px; margin-top: 10px;">
-                <h1 class='scout-title'>
-                    <span style="color: #4F46E5;">💎</span>
-                    <span style="color: #FFFFFF;"> The Obsidian </span><span style="color: #F8FAFC;">Vault</span>
+                <h1 class='vault-title'>
+                    <span>💎 The Obsidian </span><span style="color: #34D399;">Vault</span>
                 </h1>
-                <p class='scout-subtitle'>Active Yield & Subscription Command</p>
+                <p class='vault-subtitle'>Active Yield & Subscription Command</p>
             </div>
         """, unsafe_allow_html=True)
 
@@ -265,7 +268,6 @@ def render_optimization_hub():
         col_title, col_logout = st.columns([4, 1])
         col_title.success(f"Welcome back, {st.session_state.username.capitalize()}!")
         
-        # FIXED OVERLAP: Removed icon= parameter, used emoji
         if col_logout.button("🚪 Secure Logout", use_container_width=True):
             st.session_state.logged_in = False
             for key in ['username', 'wallet', 'card_limits', 'wallet_loaded']:
@@ -318,7 +320,7 @@ def render_optimization_hub():
             "📡 Live Offers Radar",
             "🏆 Milestone Rewards",
             "🔄 Subscription Saver", 
-            "✈️️ Forex Engine",
+            "✈ Forex Engine",
             "💎 Point Valuation",    
             "⚖️ Penalty Audit"      
         ])
@@ -415,7 +417,7 @@ def render_optimization_hub():
             st.write("Route your recurring bills to your highest-yielding cards.")
             
             if not st.session_state.wallet:
-                st.warning("⚠️ Please add at least one card to your Digital Wallet above to optimize subscriptions.")
+                st.warning("⚠️️ Please add at least one card to your Digital Wallet above to optimize subscriptions.")
             else:
                 c1, c2, c3, c4 = st.columns([2, 1, 1.5, 1])
                 sub_name = c1.text_input("Service Name", placeholder="e.g., Netflix")
@@ -648,11 +650,10 @@ def render_optimization_hub():
     else:
         st.markdown("""
             <div style="text-align: center; margin-bottom: 30px; margin-top: 10px;">
-                <h1 class='scout-title'>
-                    <span style="color: #4F46E5;">💎</span>
-                    <span style="color: #FFFFFF;"> The Obsidian </span><span style="color: #F8FAFC;">Vault</span>
+                <h1 class='vault-title'>
+                    <span>💎 The Obsidian </span><span style="color: #34D399;">Vault</span>
                 </h1>
-                <p class='scout-subtitle'>Active Yield & Subscription Command</p>
+                <p class='vault-subtitle'>Active Yield & Subscription Command</p>
             </div>
         """, unsafe_allow_html=True)
 
