@@ -1,14 +1,15 @@
 # views/optimization_hub.py
 import streamlit as st
 import pandas as pd
+import time
 from core.ai_agent import (
     get_fee_waiver_target, 
     get_forex_markup, 
     fetch_live_card_offers, 
     get_hidden_milestones, 
     get_utility_cashback_rate,
-    get_reward_point_values,     # NEW IMPORT
-    get_fee_and_penalty_audit    # NEW IMPORT
+    get_reward_point_values,     
+    get_fee_and_penalty_audit    
 )
 from core.db_manager import (
     create_user, 
@@ -23,11 +24,200 @@ from core.db_manager import (
 )
 
 def render_optimization_hub():
+    # --- VAULT MASTER THEME INJECTION ---
     st.markdown("""
-        <div style="text-align: center; margin-bottom: 30px; margin-top: 10px;">
-            <h1 class="obsidian-glow" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 5px;">💎 The Obsidian Vault</h1>
-            <p style="color: #94a3b8; font-size: 1.1rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;">Active Yield & Subscription Command</p>
-        </div>
+        <style>
+        /* Sleek Typography */
+        .scout-title {
+            font-family: 'Inter', -apple-system, sans-serif !important;
+            font-size: 3.2rem !important;
+            font-weight: 700 !important;
+            letter-spacing: -1px !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+            line-height: 1.1 !important;
+            text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6), 0px 0px 40px rgba(52, 211, 153, 0.2) !important;
+        }
+        .scout-subtitle {
+            font-family: 'Inter', -apple-system, sans-serif !important;
+            color: #F8FAFC !important; 
+            font-size: 0.95rem !important;
+            letter-spacing: 3px !important;
+            font-weight: 600 !important;
+            margin-top: 5px !important;
+            text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.8) !important;
+            text-transform: uppercase !important;
+        }
+
+        /* 1. MASTER CONTAINER (Dark Frosted Glass Overlay) */
+        [data-testid="stVerticalBlockBorderWrapper"] {
+            background: rgba(0, 0, 0, 0.45) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 12px !important;
+            padding: 30px !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+        }
+
+        /* 2. SOLID DARK INPUT FIELDS (Fixes Grey Cloud Override) */
+        .stTextInput > div > div > div,
+        .stNumberInput > div > div > div,
+        .stSelectbox > div > div > div,
+        .stMultiSelect > div > div > div {
+            background-color: #08100C !important; 
+            background: #08100C !important;
+            border: 1px solid rgba(52, 211, 153, 0.2) !important;
+            border-radius: 8px !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .stTextInput input,
+        .stNumberInput input,
+        [data-baseweb="base-input"] {
+            background-color: transparent !important;
+            background: transparent !important;
+            color: #FFFFFF !important;
+            -webkit-text-fill-color: #FFFFFF !important;
+        }
+
+        /* Fix the React Portals (Dropdown Menus) */
+        div[data-baseweb="popover"] > div,
+        ul[data-baseweb="menu"] {
+            background-color: #08100C !important; 
+            background: #08100C !important;
+            border: 1px solid rgba(52, 211, 153, 0.3) !important;
+            border-radius: 8px !important;
+        }
+
+        li[role="option"] {
+            background-color: transparent !important;
+            color: #FFFFFF !important;
+        }
+
+        li[role="option"]:hover,
+        li[role="option"][aria-selected="true"] {
+            background-color: rgba(52, 211, 153, 0.15) !important;
+            color: #34D399 !important;
+        }
+
+        .stTextInput > div > div > div:hover,
+        .stSelectbox > div > div > div:hover,
+        .stTextInput > div > div > div:focus-within,
+        .stSelectbox > div > div > div:focus-within {
+            background-color: #0A1611 !important;
+            border-color: #34D399 !important;
+            box-shadow: 0 0 8px rgba(52, 211, 153, 0.2) !important;
+        }
+
+        /* 3. FIX OVERLAPPING TEXT BUGS */
+        /* Hide the native expander arrow that renders as raw text on the cloud */
+        [data-testid="stExpanderToggleIcon"] { 
+            display: none !important; 
+        }
+        svg[data-baseweb="icon"] { fill: #FFFFFF !important; }
+
+        /* 4. PRIMARY & SECONDARY BUTTONS */
+        button[kind="primary"] {
+            background-color: #34D399 !important; 
+            color: #040D08 !important; 
+            border: none !important;
+            border-radius: 4px !important;
+            height: 48px !important;
+            font-weight: 700 !important;
+            font-size: 1.05rem !important;
+            box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2) !important;
+            transition: all 0.2s ease !important;
+        }
+        button[kind="primary"]:hover {
+            background-color: #2bb381 !important; 
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(52, 211, 153, 0.4) !important;
+            color: #000000 !important;
+        }
+        
+        button[kind="secondary"] {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #FFFFFF !important;
+            border-radius: 30px !important;
+            font-weight: 600 !important;
+        }
+        button[kind="secondary"]:hover {
+            background-color: rgba(52, 211, 153, 0.15) !important;
+            border-color: #34D399 !important;
+            color: #34D399 !important;
+        }
+
+        /* 5. SLEEK TABS STYLING */
+        button[data-baseweb="tab"] {
+            background-color: transparent !important;
+            color: #94A3B8 !important; 
+            font-weight: 600 !important;
+            font-size: 0.95rem !important;
+            border-bottom: 2px solid transparent !important;
+            padding: 10px 15px !important;
+            transition: all 0.3s ease !important;
+        }
+        button[data-baseweb="tab"][aria-selected="true"] {
+            color: #34D399 !important; 
+            border-bottom: 2px solid #34D399 !important;
+        }
+        button[data-baseweb="tab"]:hover {
+            color: #F8FAFC !important;
+        }
+
+        /* 6. EXPANDER STYLING (Digital Wallet) */
+        [data-testid="stExpander"] {
+            background-color: #08100C !important;
+            border: 1px solid rgba(52, 211, 153, 0.2) !important;
+            border-radius: 8px !important;
+        }
+        [data-testid="stExpander"] summary {
+            background-color: transparent !important;
+            color: #F8FAFC !important;
+            font-weight: 600 !important;
+        }
+        [data-testid="stExpander"] summary:hover {
+            color: #34D399 !important;
+        }
+
+        /* 7. AUTH RADIO BUTTONS (Mint Green Theme) */
+        div[role="radiogroup"] {
+            justify-content: center !important;
+            gap: 15px !important;
+            margin-bottom: 20px !important;
+        }
+        div[role="radiogroup"] > label {
+            background-color: #08100C !important;
+            padding: 10px 30px !important;
+            border-radius: 50px !important;
+            border: 1px solid rgba(52, 211, 153, 0.3) !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+        }
+        div[role="radiogroup"] > label:hover {
+            border-color: #34D399 !important;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.2) !important;
+        }
+        div[role="radiogroup"] > label div[data-baseweb="radio"] > div:first-child {
+            display: none !important;
+        }
+        div[role="radiogroup"] > label[aria-checked="true"] {
+            background: #34D399 !important;
+            border: none !important;
+        }
+        div[role="radiogroup"] > label p {
+            color: #94A3B8 !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+            margin: 0 !important;
+        }
+        div[role="radiogroup"] > label[aria-checked="true"] p {
+            color: #040D08 !important;
+            font-weight: 700 !important;
+        }
+        </style>
     """, unsafe_allow_html=True)
     
     if 'logged_in' not in st.session_state:
@@ -38,6 +228,16 @@ def render_optimization_hub():
     # ==========================================
     if st.session_state.logged_in:
         
+        st.markdown("""
+            <div style="text-align: center; margin-bottom: 30px; margin-top: 10px;">
+                <h1 class='scout-title'>
+                    <span style="color: #4F46E5;">💎</span>
+                    <span style="color: #FFFFFF;"> The Obsidian </span><span style="color: #F8FAFC;">Vault</span>
+                </h1>
+                <p class='scout-subtitle'>Active Yield & Subscription Command</p>
+            </div>
+        """, unsafe_allow_html=True)
+
         if 'wallet_loaded' not in st.session_state:
             saved_cards = get_wallet_cards(st.session_state.username)
             st.session_state.wallet = [card[0] for card in saved_cards]
@@ -48,7 +248,8 @@ def render_optimization_hub():
         col_title, col_logout = st.columns([4, 1])
         col_title.success(f"Welcome back, {st.session_state.username.capitalize()}!")
         
-        if col_logout.button("Secure Logout", icon=":material/logout:", use_container_width=True):
+        # FIXED OVERLAP: Removed icon= parameter, used emoji
+        if col_logout.button("🚪 Secure Logout", use_container_width=True):
             st.session_state.logged_in = False
             for key in ['username', 'wallet', 'card_limits', 'wallet_loaded']:
                 if key in st.session_state:
@@ -58,7 +259,6 @@ def render_optimization_hub():
         # --- DIGITAL WALLET SECTION ---
         with st.expander("💳 My Digital Wallet (Add & Manage your cards here)", expanded=len(st.session_state.wallet) == 0):
             
-            # --- 1. ADD NEW CARD ---
             c_input, c_limit, c_btn = st.columns([3, 2, 1])
             new_card = c_input.text_input("Enter a credit card:", placeholder="e.g., HDFC Regalia")
             card_limit = c_limit.number_input("Monthly Credit Limit (₹):", min_value=5000, step=10000, value=50000)
@@ -73,7 +273,6 @@ def render_optimization_hub():
             
             st.markdown("---")
             
-            # --- 2. MANAGE SAVED CARDS ---
             if st.session_state.wallet:
                 st.write("**Your Active Cards (Modify limit or remove):**")
                 
@@ -97,20 +296,19 @@ def render_optimization_hub():
 
         st.markdown("---")
 
-        # ---> NEW EXPANDED 7-TAB SEQUENCE <---
         tab_waiver, tab_offers, tab_milestones, tab_sub, tab_forex, tab_points, tab_audit = st.tabs([
             "⏳ Fee Waiver Pacing", 
             "📡 Live Offers Radar",
             "🏆 Milestone Rewards",
             "🔄 Subscription Saver", 
-            "✈️ Forex Engine",
-            "💎 Point Valuation",    # NEW
-            "⚖️ Penalty Audit"      # NEW
+            "✈️️ Forex Engine",
+            "💎 Point Valuation",    
+            "⚖️ Penalty Audit"      
         ])
 
         # --- TAB 1: FEE WAIVER PACING ---
         with tab_waiver:
-            st.markdown("### Fee Waiver Pace Tracker")
+            st.markdown("<h3 style='color: #F8FAFC;'>Fee Waiver Pace Tracker</h3>", unsafe_allow_html=True)
             st.write("Track if you are spending enough to get your annual fee waived.")
             
             if not st.session_state.wallet:
@@ -152,7 +350,7 @@ def render_optimization_hub():
 
         # --- TAB 2: LIVE OFFERS RADAR ---
         with tab_offers:
-            st.markdown("### Live Offers & Sales Radar")
+            st.markdown("<h3 style='color: #F8FAFC;'>Live Offers & Sales Radar</h3>", unsafe_allow_html=True)
             st.caption("AI-powered radar tracking active discounts across E-Commerce, Dining, Flights, IRCTC Trains, and Fuel pumps.")
             
             if not st.session_state.wallet:
@@ -161,14 +359,12 @@ def render_optimization_hub():
                 c_sel, c_btn = st.columns([3, 1])
                 selected_offer_card = c_sel.selectbox("Select card to scan:", st.session_state.wallet, key="offer_scan")
                 
-                # Align button vertically with the selectbox input
                 c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
                 if c_btn.button("📡 Scan Web", type="primary", use_container_width=True):
                     with st.spinner(f"Scanning web for flights, trains, fuel, dining & shopping deals on '{selected_offer_card}'..."):
                         offers_data = fetch_live_card_offers(selected_offer_card)
                         st.session_state[f"offers_{selected_offer_card}"] = offers_data
 
-                # Persist offers on screen across re-renders
                 saved_offers = st.session_state.get(f"offers_{selected_offer_card}")
                 if saved_offers:
                     st.markdown("---")
@@ -176,7 +372,7 @@ def render_optimization_hub():
 
         # --- TAB 3: MILESTONE REWARDS ---
         with tab_milestones:
-            st.markdown("### Hidden Milestone Rewards")
+            st.markdown("<h3 style='color: #F8FAFC;'>Hidden Milestone Rewards</h3>", unsafe_allow_html=True)
             st.caption("Discover high-value bonuses (like flight tickets or hotel vouchers) triggered by hitting annual spending limits.")
             
             if not st.session_state.wallet:
@@ -185,14 +381,12 @@ def render_optimization_hub():
                 c_sel, c_btn = st.columns([3, 1])
                 milestone_card = c_sel.selectbox("Select card to analyze:", st.session_state.wallet, key="milestone_card")
                 
-                # Align button vertically with the selectbox input
                 c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
                 if c_btn.button("🔍 Scan for Hidden Rewards", type="primary", use_container_width=True):
                     with st.spinner(f"Extracting milestone data for {milestone_card}..."):
                         milestones_data = get_hidden_milestones(milestone_card)
                         st.session_state[f"milestones_{milestone_card}"] = milestones_data
                 
-                # Persist milestones on screen across re-renders
                 saved_milestones = st.session_state.get(f"milestones_{milestone_card}")
                 if saved_milestones:
                     st.markdown("---")
@@ -200,13 +394,12 @@ def render_optimization_hub():
 
         # --- TAB 4: SUBSCRIPTION SAVER ---
         with tab_sub:
-            st.markdown("### Active Digital Subscriptions")
+            st.markdown("<h3 style='color: #F8FAFC;'>Active Digital Subscriptions</h3>", unsafe_allow_html=True)
             st.write("Route your recurring bills to your highest-yielding cards.")
             
             if not st.session_state.wallet:
                 st.warning("⚠️ Please add at least one card to your Digital Wallet above to optimize subscriptions.")
             else:
-                # --- INPUT ROW ---
                 c1, c2, c3, c4 = st.columns([2, 1, 1.5, 1])
                 sub_name = c1.text_input("Service Name", placeholder="e.g., Netflix")
                 sub_amt = c2.number_input("Monthly Cost (₹)", min_value=0.0, step=100.0)
@@ -223,12 +416,10 @@ def render_optimization_hub():
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 
-                # --- FETCH & AUTO-SYNC ---
                 raw_subs = get_subscriptions(st.session_state.username)
                 valid_subs = []
                 needs_sync_rerun = False
                 
-                # Cascading Delete: Check if any bills belong to cards no longer in the wallet
                 if raw_subs:
                     for sub in raw_subs:
                         db_service, db_amt, db_card = sub[0], sub[1], sub[2]
@@ -239,16 +430,14 @@ def render_optimization_hub():
                             valid_subs.append(sub)
                             
                 if needs_sync_rerun:
-                    st.rerun() # Refresh screen instantly if orphans were deleted
+                    st.rerun() 
                 
-                # --- RENDER UI ---
                 if valid_subs:
-                    st.markdown("### 📊 Subscription Analytics")
+                    st.markdown("<h3 style='color: #F8FAFC;'>📊 Subscription Analytics</h3>", unsafe_allow_html=True)
                     
                     df = pd.DataFrame(valid_subs, columns=["Service", "Monthly (₹)", "Card Used"])
                     df["Action"] = "🟢 Active"
                     
-                    # 1. Dynamic Card Filter
                     unique_cards = df["Card Used"].unique().tolist()
                     filter_options = ["All Cards"] + unique_cards
                     selected_filter = st.selectbox("Filter Dashboard by Card:", filter_options, label_visibility="collapsed")
@@ -258,10 +447,8 @@ def render_optimization_hub():
                     else:
                         filtered_df = df
 
-                    # 2. Render Datatable (First)
                     st.dataframe(filtered_df, use_container_width=True, hide_index=True)
                     
-                    # 3. Calculate KPI Metrics
                     total_monthly = filtered_df["Monthly (₹)"].sum()
                     annual_spend = total_monthly * 12
                     
@@ -275,32 +462,30 @@ def render_optimization_hub():
                         est_annual_yield = annual_spend * 0.02 
                         yield_label = "(~2.0% Estimated Mixed Yield)"
                     
-                    # 4. Render KPI Dashboard (Second)
                     st.markdown(f"""
                     <div style="display: flex; gap: 15px; margin-top: 10px; margin-bottom: 20px;">
-                        <div style="flex: 1; background: #1A2235; border: 1px solid #2D3748; border-radius: 10px; padding: 15px; text-align: center;">
+                        <div style="flex: 1; background: #08100C; border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 10px; padding: 15px; text-align: center;">
                             <p style="color: #94A3B8; margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Annual Auto-Debits</p>
                             <h3 style="color: #E2E8F0; margin: 5px 0 0 0; font-size: 1.8rem;">₹{annual_spend:,.0f}</h3>
                         </div>
-                        <div style="flex: 1; background: #1A2235; border: 1px solid #ef4444; border-radius: 10px; padding: 15px; text-align: center;">
+                        <div style="flex: 1; background: #08100C; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 15px; text-align: center;">
                             <p style="color: #ef4444; margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">UPI / Debit Yield</p>
                             <h3 style="color: #ef4444; margin: 5px 0 0 0; font-size: 1.8rem;">₹0</h3>
                         </div>
-                        <div style="flex: 1; background: linear-gradient(135deg, #0284C7, #06B6D4); border: none; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(6,182,212,0.3);">
-                            <p style="color: #E0F2FE; margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Credit Card Yield</p>
-                            <h3 style="color: #FFFFFF; margin: 5px 0 0 0; font-size: 1.8rem;">₹{est_annual_yield:,.0f}</h3>
-                            <p style="color: #BAE6FD; margin: 5px 0 0 0; font-size: 12px;">{yield_label}</p>
+                        <div style="flex: 1; background: #34D399; border: none; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);">
+                            <p style="color: #040D08; margin: 0; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Credit Card Yield</p>
+                            <h3 style="color: #040D08; margin: 5px 0 0 0; font-size: 1.8rem; font-weight: 800;">₹{est_annual_yield:,.0f}</h3>
+                            <p style="color: #040D08; margin: 5px 0 0 0; font-size: 12px; font-weight: 600;">{yield_label}</p>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    # 5. Simple & Bug-Free Delete Manager (Moved to Bottom)
                     with st.expander("🗑️ Delete a tracked bill"):
-                        # Combine name and card so duplicates (like 2 Netflix bills) can be safely deleted
                         df["Unique_ID"] = df["Service"] + " (paid via " + df["Card Used"] + ")"
                         del_col1, del_col2 = st.columns([3, 1])
                         target_unique = del_col1.selectbox("Select bill to delete:", df["Unique_ID"].unique(), label_visibility="collapsed")
                         
+                        del_col2.markdown("<div style='margin-top: 0px;'></div>", unsafe_allow_html=True)
                         if del_col2.button("Delete Bill", type="secondary", use_container_width=True):
                             selected_row = df[df["Unique_ID"] == target_unique].iloc[0]
                             delete_subscription(st.session_state.username, selected_row["Service"], selected_row["Card Used"])
@@ -311,7 +496,7 @@ def render_optimization_hub():
 
         # --- TAB 5: FOREX ENGINE ---
         with tab_forex:
-            st.markdown("### Cross-Border Forex Optimizer")
+            st.markdown("<h3 style='color: #F8FAFC;'>Cross-Border Forex Optimizer</h3>", unsafe_allow_html=True)
             
             if not st.session_state.wallet:
                 st.warning("⚠️ Please add a card to your Digital Wallet above to analyze Forex markups.")
@@ -345,7 +530,6 @@ def render_optimization_hub():
                     else:
                         st.success(f"**Action:** Great choice! {travel_card} has 0% markup. Swipe away!")
                 
-                # --- PROPERLY INDENTED DISCLAIMER ---
                 st.markdown("""
                     <div style="margin-top: 15px; padding: 12px; border-left: 3px solid #F59E0B; background-color: rgba(245, 158, 11, 0.1); border-radius: 5px;">
                         <p style="color: #FCD34D; margin: 0; font-size: 13px; line-height: 1.4;">
@@ -356,7 +540,7 @@ def render_optimization_hub():
 
         # --- TAB 6: REWARD POINT MATRIX ---
         with tab_points:
-            st.markdown("### 💎 Reward Point Conversion Matrix")
+            st.markdown("<h3 style='color: #F8FAFC;'>💎 Reward Point Conversion Matrix</h3>", unsafe_allow_html=True)
             st.write("Stop redeeming points blindly. See the exact INR value of your balance across redemption channels.")
             
             if not st.session_state.wallet:
@@ -380,20 +564,20 @@ def render_optimization_hub():
                 st.markdown("---")
                 st.markdown(f"""
                 <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                    <div style="flex: 1; background: #1A2235; border: 1px solid #2D3748; border-radius: 8px; padding: 15px; text-align: center;">
-                        <p style="color: #94A3B8; margin: 0; font-size: 13px; text-transform: uppercase;">Statement Credit (Cash)</p>
+                    <div style="flex: 1; background: #08100C; border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 8px; padding: 15px; text-align: center;">
+                        <p style="color: #94A3B8; margin: 0; font-size: 13px; text-transform: uppercase;">Statement Credit</p>
                         <h3 style="color: #E2E8F0; margin: 5px 0 0 0; font-size: 1.5rem;">₹{cash_val:,.0f}</h3>
                         <p style="color: #64748B; margin: 0; font-size: 12px;">₹{pt_data.get('cash_rate', 0):.2f} / pt</p>
                     </div>
-                    <div style="flex: 1; background: #1A2235; border: 1px solid #2D3748; border-radius: 8px; padding: 15px; text-align: center;">
+                    <div style="flex: 1; background: #08100C; border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 8px; padding: 15px; text-align: center;">
                         <p style="color: #94A3B8; margin: 0; font-size: 13px; text-transform: uppercase;">Brand Vouchers</p>
                         <h3 style="color: #E2E8F0; margin: 5px 0 0 0; font-size: 1.5rem;">₹{voucher_val:,.0f}</h3>
                         <p style="color: #64748B; margin: 0; font-size: 12px;">₹{pt_data.get('voucher_rate', 0):.2f} / pt</p>
                     </div>
-                    <div style="flex: 1; background: linear-gradient(135deg, #059669, #10B981); border: none; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
-                        <p style="color: #D1FAE5; margin: 0; font-size: 13px; text-transform: uppercase;">Travel / Miles Transfer</p>
-                        <h3 style="color: #FFFFFF; margin: 5px 0 0 0; font-size: 1.5rem;">₹{travel_val:,.0f}</h3>
-                        <p style="color: #A7F3D0; margin: 0; font-size: 12px;">₹{pt_data.get('travel_rate', 0):.2f} / pt</p>
+                    <div style="flex: 1; background: #34D399; border: none; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);">
+                        <p style="color: #040D08; margin: 0; font-size: 13px; font-weight: 700; text-transform: uppercase;">Travel Transfer</p>
+                        <h3 style="color: #040D08; margin: 5px 0 0 0; font-weight: 800; font-size: 1.5rem;">₹{travel_val:,.0f}</h3>
+                        <p style="color: #040D08; margin: 0; font-weight: 600; font-size: 12px;">₹{pt_data.get('travel_rate', 0):.2f} / pt</p>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -407,7 +591,7 @@ def render_optimization_hub():
 
         # --- TAB 7: PENALTY AUDIT ---
         with tab_audit:
-            st.markdown("### ⚖️ Comprehensive Fee & Penalty Audit")
+            st.markdown("<h3 style='color: #F8FAFC;'>⚖️ Comprehensive Fee & Penalty Audit</h3>", unsafe_allow_html=True)
             st.write("A strict breakdown of the hidden terms, conditions, and penalties attached to your card.")
             
             if not st.session_state.wallet:
@@ -421,7 +605,7 @@ def render_optimization_hub():
                 st.markdown("---")
                 
                 a1, a2 = st.columns(2)
-                a1.markdown(f"**Annual / Joining Fee:**<br><span style='color:#06B6D4'>{audit_data.get('annual_fee', 'N/A')}</span>", unsafe_allow_html=True)
+                a1.markdown(f"**Annual / Joining Fee:**<br><span style='color:#34D399'>{audit_data.get('annual_fee', 'N/A')}</span>", unsafe_allow_html=True)
                 a2.markdown(f"**Interest Rate (APR):**<br><span style='color:#ef4444'>{audit_data.get('apr', 'N/A')}</span>", unsafe_allow_html=True)
                 
                 st.markdown("<br>", unsafe_allow_html=True)
@@ -446,42 +630,13 @@ def render_optimization_hub():
     # ==========================================
     else:
         st.markdown("""
-            <style>
-            div[role="radiogroup"] {
-                justify-content: center !important;
-                gap: 15px !important;
-                margin-bottom: 20px !important;
-            }
-            div[role="radiogroup"] > label {
-                background-color: #1A2235 !important;
-                padding: 10px 30px !important;
-                border-radius: 50px !important;
-                border: 1px solid #2D3748 !important;
-                transition: all 0.3s ease !important;
-                cursor: pointer !important;
-            }
-            div[role="radiogroup"] > label:hover {
-                border-color: #06B6D4 !important;
-                box-shadow: 0 0 10px rgba(6,182,212,0.2) !important;
-            }
-            div[role="radiogroup"] > label div[data-baseweb="radio"] > div:first-child {
-                display: none !important;
-            }
-            div[role="radiogroup"] > label[aria-checked="true"] {
-                background: linear-gradient(135deg, #0284C7 0%, #06B6D4 100%) !important;
-                border: none !important;
-            }
-            div[role="radiogroup"] > label p {
-                color: #94A3B8 !important;
-                font-weight: 600 !important;
-                font-size: 15px !important;
-                margin: 0 !important;
-            }
-            div[role="radiogroup"] > label[aria-checked="true"] p {
-                color: #FFFFFF !important;
-                text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
-            }
-            </style>
+            <div style="text-align: center; margin-bottom: 30px; margin-top: 10px;">
+                <h1 class='scout-title'>
+                    <span style="color: #4F46E5;">💎</span>
+                    <span style="color: #FFFFFF;"> The Obsidian </span><span style="color: #F8FAFC;">Vault</span>
+                </h1>
+                <p class='scout-subtitle'>Active Yield & Subscription Command</p>
+            </div>
         """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
