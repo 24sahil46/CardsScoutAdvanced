@@ -58,63 +58,53 @@ def render_guest_scout():
         /* ----------------------------------------------------------- */
         
         /* ----------------------------------------------------------- */
-        /* --- THE PERFECT INPUT FIELD FIX (ULTIMATE BLACK GLASS) --- */
+        /* --- THE PERFECT INPUT FIELD FIX (NUCLEAR OVERRIDE) --- */
         
-        /* 1. Target the outermost data-testid wrappers to absolutely override the Cloud Theme */
-        [data-testid="stTextInput"] div[data-baseweb="input"],
-        [data-testid="stNumberInput"] div[data-baseweb="input"],
-        [data-testid="stSelectbox"] div[data-baseweb="select"] > div,
-        [data-testid="stMultiSelect"] div[data-baseweb="select"] > div {
-            background-color: rgba(0, 0, 0, 0.6) !important; 
-            background: rgba(0, 0, 0, 0.6) !important; 
-            backdrop-filter: blur(10px) !important; 
+        /* 1. Apply the Black Glass strictly to the main wrapper */
+        div[data-testid="stTextInput"] div[data-baseweb="input"],
+        div[data-testid="stNumberInput"] div[data-baseweb="input"],
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div,
+        div[data-testid="stMultiSelect"] div[data-baseweb="select"] > div {
+            background-color: rgba(0, 0, 0, 0.6) !important;
+            backdrop-filter: blur(10px) !important;
             -webkit-backdrop-filter: blur(10px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
             border-radius: 8px !important;
             transition: all 0.3s ease !important;
         }
-        
-        /* 2. Hover and Focus States */
-        [data-testid="stTextInput"] div[data-baseweb="input"]:hover,
-        [data-testid="stNumberInput"] div[data-baseweb="input"]:hover,
-        [data-testid="stSelectbox"] div[data-baseweb="select"] > div:hover,
-        [data-testid="stMultiSelect"] div[data-baseweb="select"] > div:hover,
-        [data-testid="stTextInput"] div[data-baseweb="input"]:focus-within,
-        [data-testid="stNumberInput"] div[data-baseweb="input"]:focus-within {
-            border-color: #34D399 !important; 
+
+        /* 2. THE NUCLEAR WILDCARD: Strip backgrounds from ALL hidden inner elements */
+        div[data-testid="stTextInput"] div[data-baseweb="input"] *,
+        div[data-testid="stNumberInput"] div[data-baseweb="input"] *,
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div *,
+        div[data-testid="stMultiSelect"] div[data-baseweb="select"] > div * {
+            background-color: transparent !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            color: #F8FAFC !important;
+        }
+
+        /* 3. Hover & Focus Effects for the main wrapper */
+        div[data-testid="stTextInput"] div[data-baseweb="input"]:hover,
+        div[data-testid="stNumberInput"] div[data-baseweb="input"]:hover,
+        div[data-testid="stSelectbox"] div[data-baseweb="select"] > div:hover,
+        div[data-testid="stMultiSelect"] div[data-baseweb="select"] > div:hover,
+        div[data-testid="stTextInput"] div[data-baseweb="input"]:focus-within,
+        div[data-testid="stNumberInput"] div[data-baseweb="input"]:focus-within {
+            border-color: #34D399 !important;
             background-color: rgba(0, 0, 0, 0.8) !important;
-            background: rgba(0, 0, 0, 0.8) !important;
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.3) !important;
         }
 
-        /* 3. Strip ALL default grey backgrounds from inner text elements */
-        [data-testid="stTextInput"] div[data-baseweb="base-input"],
-        [data-testid="stNumberInput"] div[data-baseweb="base-input"],
-        [data-testid="stTextInput"] input,
-        [data-testid="stNumberInput"] input,
-        [data-testid="stSelectbox"] input,
-        [data-testid="stMultiSelect"] input {
-            background-color: transparent !important;
-            background: transparent !important;
-            border: none !important;
-            color: #F8FAFC !important;
-            box-shadow: none !important;
-        }
-
-        /* 4. Number Input Plus/Minus Buttons */
-        [data-testid="stNumberInputStepDown"],
-        [data-testid="stNumberInputStepUp"] {
-            background-color: transparent !important;
-            background: transparent !important;
-            color: #F8FAFC !important;
-            border: none !important;
-        }
-
+        /* 4. Fix Plus/Minus hover states on Number Inputs */
         [data-testid="stNumberInputStepDown"]:hover,
         [data-testid="stNumberInputStepUp"]:hover {
             color: #34D399 !important;
-            background-color: rgba(0, 0, 0, 0.4) !important;
-            background: rgba(0, 0, 0, 0.4) !important;
+        }
+        
+        /* Fix the dropdown icon color */
+        svg[data-baseweb="icon"] {
+            fill: #F8FAFC !important;
         }
         /* ----------------------------------------------------------- */
 
