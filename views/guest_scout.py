@@ -49,22 +49,20 @@ def render_guest_scout():
             font-size: 0.9rem !important;
         }
 
-       /* ----------------------------------------------------------- */
-        /* --- 2. INPUT FIELDS & DROPDOWNS (SOLID DARK THEME) --- */
+        /* ----------------------------------------------------------- */
+        /* --- 2. SOLID DARK INPUT FIELDS (Synced with Vault) --- */
         
-        /* 1. Force solid dark background on the main input wrappers */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
         .stSelectbox > div > div > div,
         .stMultiSelect > div > div > div {
-            background-color: #08100C !important; /* Solid dark green-black */
+            background-color: #08100C !important; 
             background: #08100C !important;
             border: 1px solid rgba(52, 211, 153, 0.2) !important;
             border-radius: 8px !important;
             transition: all 0.2s ease !important;
         }
-
-        /* 2. Strip inner elements so they inherit the solid dark wrapper */
+        
         .stTextInput input,
         .stNumberInput input,
         [data-baseweb="base-input"] {
@@ -74,83 +72,61 @@ def render_guest_scout():
             -webkit-text-fill-color: #FFFFFF !important;
         }
 
-        /* 3. FIX THE DETACHED DROPDOWN MENU (The React Portal) */
+        /* Dropdown Menus */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
-            background-color: #08100C !important; /* Match solid dark */
+            background-color: #08100C !important; 
             background: #08100C !important;
             border: 1px solid rgba(52, 211, 153, 0.3) !important;
             border-radius: 8px !important;
         }
 
-        /* Dropdown Options */
         li[role="option"] {
             background-color: transparent !important;
-            background: transparent !important;
             color: #FFFFFF !important;
-            transition: all 0.2s ease !important;
         }
 
-        /* Hover states for dropdown options */
         li[role="option"]:hover,
         li[role="option"][aria-selected="true"] {
             background-color: rgba(52, 211, 153, 0.15) !important;
-            background: rgba(52, 211, 153, 0.15) !important;
             color: #34D399 !important;
         }
 
-        /* 4. Hover & Focus state for the main input boxes */
         .stTextInput > div > div > div:hover,
         .stSelectbox > div > div > div:hover,
-        .stMultiSelect > div > div > div:hover,
-        .stNumberInput > div > div > div:hover,
         .stTextInput > div > div > div:focus-within,
-        .stSelectbox > div > div > div:focus-within,
-        .stMultiSelect > div > div > div:focus-within {
-            background-color: #0A1611 !important; /* Slightly lighter solid dark on hover */
-            background: #0A1611 !important;
+        .stSelectbox > div > div > div:focus-within {
+            background-color: #0A1611 !important;
             border-color: #34D399 !important;
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.2) !important;
         }
 
-        /* 5. Number Input (+ / -) Buttons */
         [data-testid="stNumberInputStepDown"],
         [data-testid="stNumberInputStepUp"] {
-            background: transparent !important;
+            background-color: transparent !important;
             color: #FFFFFF !important;
+            border: none !important;
         }
         [data-testid="stNumberInputStepDown"]:hover,
         [data-testid="stNumberInputStepUp"]:hover {
             color: #34D399 !important;
         }
-
-        /* 6. Dropdown SVG Arrow & Selected Tags */
+        
         svg[data-baseweb="icon"] { fill: #FFFFFF !important; }
-        
-        span[data-baseweb="tag"] {
-            background-color: rgba(52, 211, 153, 0.15) !important;
-            background: rgba(52, 211, 153, 0.15) !important;
-            border: 1px solid rgba(52, 211, 153, 0.3) !important;
-            color: #34D399 !important;
-        }
+
         /* ----------------------------------------------------------- */
-
-
-        /* --- 3. THE ACTION BUTTONS --- */
+        /* --- 3. PRIMARY & SECONDARY BUTTONS (Synced with Vault Nav) --- */
         
-        button[kind="primary"], button[kind="secondary"] {
-            transition: all 0.2s ease !important;
-            font-weight: 700 !important;
-        }
-
         button[kind="primary"] {
             background-color: #34D399 !important; 
             color: #040D08 !important; 
             border: none !important;
             border-radius: 4px !important;
             height: 48px !important;
+            font-weight: 700 !important;
             font-size: 1.05rem !important;
             box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2) !important;
+            transition: all 0.2s ease !important;
         }
         
         button[kind="primary"]:hover {
@@ -160,15 +136,24 @@ def render_guest_scout():
             color: #000000 !important;
         }
         
+        /* Sleek Hollow Pills for Top Navigator */
         button[kind="secondary"] {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-            border: none !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
             color: #FFFFFF !important;
             border-radius: 30px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
         }
-        button[kind="secondary"]:hover {
-            background-color: rgba(255, 255, 255, 0.2) !important;
-            color: #FFFFFF !important;
+        
+        /* Mint Green Highlight for Hover & Active Nav State */
+        button[kind="secondary"]:hover,
+        button[kind="secondary"]:focus,
+        button[kind="secondary"]:active {
+            background-color: rgba(52, 211, 153, 0.1) !important;
+            border-color: #34D399 !important;
+            color: #34D399 !important;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.15) !important;
         }
 
         /* ----------------------------------------------------------- */
