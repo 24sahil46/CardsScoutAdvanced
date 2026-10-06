@@ -258,6 +258,14 @@ def render_optimization_hub():
         [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child {
             display: none !important;
         }
+        /* If the "Show password" checkbox is NOT checked, mask the text like dots */
+        /* Note: This targets the input when checkbox state is false */
+        div[data-testid="stCheckbox"] input[aria-checked="false"] ~ * /* fallback styling */
+        
+        /* Universal bullet mask when show password is unchecked */
+        input[aria-label="Password"] {
+            -webkit-text-security: disc;
+        }
         </style>
     """, unsafe_allow_html=True)
     
@@ -668,6 +676,15 @@ def render_optimization_hub():
     # IF NOT LOGGED IN: Show Login/Signup form
     # ==========================================
     else:
+        # 1. SILENT CSS TO NUKE THE BROKEN NATIVE 'VISIBILITY' TEXT FOREVER
+        st.markdown("""
+            <style>
+            [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child {
+                display: none !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
         st.markdown("""
             <div style="text-align: center; margin-bottom: 30px; margin-top: 10px;">
                 <h1 class='vault-title'>
@@ -690,30 +707,20 @@ def render_optimization_hub():
                 
                 username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., sahil_wealth", key="login_username")
                 
-                # Persistent Session State tracker for password text
-                if "raw_password_input" not in st.session_state:
-                    st.session_state.raw_password_input = ""
-
-                # Toggle state tracker
-                if "show_pwd_checkbox" not in st.session_state:
-                    st.session_state.show_pwd_checkbox = False
-
+                # --- ROCK SOLID PASSWORD TOGGLE ---
                 st.markdown("🔑 **Security Clearance (Password)**")
                 
-                # Standard text input that safely saves to session state
-                pwd_input = st.text_input(
+                # Custom Checkbox
+                show_password = st.checkbox("Show password", key="show_pwd_checkbox")
+                
+                # Dynamically switch type based on checkbox. The native eye icon is destroyed by the CSS above!
+                password = st.text_input(
                     "Password", 
-                    value=st.session_state.raw_password_input, 
-                    type="default" if st.session_state.show_pwd_checkbox else "password", 
+                    type="default" if show_password else "password", 
                     placeholder="Enter your secret passcode", 
                     label_visibility="collapsed",
-                    key="sync_password_box"
+                    key="login_password_box"
                 )
-                st.session_state.raw_password_input = pwd_input
-                password = st.session_state.raw_password_input
-
-                # Clean 'Show password' checkbox underneath
-                st.session_state.show_pwd_checkbox = st.checkbox("Show password", value=st.session_state.show_pwd_checkbox)
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 
