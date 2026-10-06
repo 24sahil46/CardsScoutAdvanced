@@ -56,40 +56,52 @@ def render_guest_scout():
         }
 
         /* ----------------------------------------------------------- */
-        /* --- THE PERFECT INPUT FIELD FIX (CLOUD-PROOF) --- */
+        /* --- THE PERFECT INPUT FIELD FIX (ULTIMATE CLOUD-PROOF) --- */
         
-        /* 1. The Outer Wrapper: Gets the transparent glass effect */
-        div[data-baseweb="input"],
-        div[data-baseweb="select"] > div,
-        div[data-testid="stNumberInputContainer"] {
+        /* 1. The Outer Wrapper: Prefixing with Streamlit classes for max specificity */
+        .stTextInput div[data-baseweb="input"],
+        .stSelectbox div[data-baseweb="select"] > div,
+        .stMultiSelect div[data-baseweb="select"] > div,
+        .stNumberInput div[data-baseweb="input"] {
             background-color: rgba(10, 20, 15, 0.3) !important; 
+            background: rgba(10, 20, 15, 0.3) !important; /* Force override shorthand */
             backdrop-filter: blur(12px) !important; 
             -webkit-backdrop-filter: blur(12px) !important;
-            border-color: rgba(255, 255, 255, 0.15) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
             transition: all 0.3s ease !important;
         }
         
-        div[data-baseweb="select"] > div { border-radius: 8px !important; }
+        .stSelectbox div[data-baseweb="select"] > div,
+        .stMultiSelect div[data-baseweb="select"] > div { 
+            border-radius: 8px !important; 
+        }
         
-        div[data-baseweb="input"]:hover,
-        div[data-baseweb="select"] > div:hover,
-        div[data-baseweb="input"]:focus-within {
+        /* Hover and Focus States */
+        .stTextInput div[data-baseweb="input"]:hover,
+        .stSelectbox div[data-baseweb="select"] > div:hover,
+        .stMultiSelect div[data-baseweb="select"] > div:hover,
+        .stNumberInput div[data-baseweb="input"]:hover,
+        .stTextInput div[data-baseweb="input"]:focus-within,
+        .stNumberInput div[data-baseweb="input"]:focus-within {
             border-color: #34D399 !important; 
             background-color: rgba(15, 22, 28, 0.6) !important;
+            background: rgba(15, 22, 28, 0.6) !important;
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.3) !important;
         }
 
-        /* 2. The Inner Elements: Must be forced transparent to block Cloud Theme overrides */
+        /* 2. Force deepest inner elements completely transparent */
         div[data-baseweb="base-input"],
         div[data-baseweb="base-input"] > input,
         div[data-baseweb="base-input"] > textarea,
-        input[class*="st-"], 
-        input[type="text"], 
-        input[type="number"] {
+        .stTextInput input,
+        .stNumberInput input,
+        .stSelectbox input,
+        .stMultiSelect input {
             background-color: transparent !important;
             background: transparent !important;
             border: none !important;
             color: #F8FAFC !important;
+            box-shadow: none !important;
         }
 
         /* 3. Number Input Plus/Minus Buttons */
@@ -98,12 +110,14 @@ def render_guest_scout():
             background-color: transparent !important;
             background: transparent !important;
             color: #F8FAFC !important;
+            border: none !important;
         }
 
         [data-testid="stNumberInputStepDown"]:hover,
         [data-testid="stNumberInputStepUp"]:hover {
             color: #34D399 !important;
             background-color: rgba(52, 211, 153, 0.15) !important;
+            background: rgba(52, 211, 153, 0.15) !important;
         }
         /* ----------------------------------------------------------- */
 
