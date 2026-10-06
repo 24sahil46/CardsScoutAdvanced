@@ -50,20 +50,21 @@ def render_guest_scout():
         }
 
        /* ----------------------------------------------------------- */
-        /* --- 2. INPUT FIELDS & REACT PORTALS --- */
+        /* --- 2. INPUT FIELDS & DROPDOWNS (SOLID DARK THEME) --- */
         
-        /* 1. Force translucent glass directly onto the base Streamlit widgets */
+        /* 1. Force solid dark background on the main input wrappers */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
         .stSelectbox > div > div > div,
         .stMultiSelect > div > div > div {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-            background: rgba(255, 255, 255, 0.1) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            background-color: #08100C !important; /* Solid dark green-black */
+            background: #08100C !important;
+            border: 1px solid rgba(52, 211, 153, 0.2) !important;
             border-radius: 8px !important;
+            transition: all 0.2s ease !important;
         }
 
-        /* 2. Nuke the grey backgrounds from the actual typing areas */
+        /* 2. Strip inner elements so they inherit the solid dark wrapper */
         .stTextInput input,
         .stNumberInput input,
         [data-baseweb="base-input"] {
@@ -74,11 +75,10 @@ def render_guest_scout():
         }
 
         /* 3. FIX THE DETACHED DROPDOWN MENU (The React Portal) */
-        /* This targets the teleported dropdown box that appears when clicked */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
-            background-color: #0b110e !important; /* Solid dark theme color */
-            background: #0b110e !important;
+            background-color: #08100C !important; /* Match solid dark */
+            background: #08100C !important;
             border: 1px solid rgba(52, 211, 153, 0.3) !important;
             border-radius: 8px !important;
         }
@@ -91,33 +91,48 @@ def render_guest_scout():
             transition: all 0.2s ease !important;
         }
 
-        /* When hovering over an option in the dropdown */
+        /* Hover states for dropdown options */
         li[role="option"]:hover,
         li[role="option"][aria-selected="true"] {
-            background-color: rgba(52, 211, 153, 0.2) !important;
-            background: rgba(52, 211, 153, 0.2) !important;
+            background-color: rgba(52, 211, 153, 0.15) !important;
+            background: rgba(52, 211, 153, 0.15) !important;
             color: #34D399 !important;
         }
 
-        /* Hover & Focus state for the main boxes */
+        /* 4. Hover & Focus state for the main input boxes */
         .stTextInput > div > div > div:hover,
         .stSelectbox > div > div > div:hover,
+        .stMultiSelect > div > div > div:hover,
+        .stNumberInput > div > div > div:hover,
         .stTextInput > div > div > div:focus-within,
-        .stSelectbox > div > div > div:focus-within {
-            background-color: rgba(255, 255, 255, 0.15) !important;
-            background: rgba(255, 255, 255, 0.15) !important;
-            border-color: rgba(52, 211, 153, 0.4) !important;
+        .stSelectbox > div > div > div:focus-within,
+        .stMultiSelect > div > div > div:focus-within {
+            background-color: #0A1611 !important; /* Slightly lighter solid dark on hover */
+            background: #0A1611 !important;
+            border-color: #34D399 !important;
+            box-shadow: 0 0 8px rgba(52, 211, 153, 0.2) !important;
         }
 
-        /* Number Input (+ / -) Buttons */
+        /* 5. Number Input (+ / -) Buttons */
         [data-testid="stNumberInputStepDown"],
         [data-testid="stNumberInputStepUp"] {
             background: transparent !important;
             color: #FFFFFF !important;
         }
+        [data-testid="stNumberInputStepDown"]:hover,
+        [data-testid="stNumberInputStepUp"]:hover {
+            color: #34D399 !important;
+        }
 
-        /* Dropdown SVG Arrow */
+        /* 6. Dropdown SVG Arrow & Selected Tags */
         svg[data-baseweb="icon"] { fill: #FFFFFF !important; }
+        
+        span[data-baseweb="tag"] {
+            background-color: rgba(52, 211, 153, 0.15) !important;
+            background: rgba(52, 211, 153, 0.15) !important;
+            border: 1px solid rgba(52, 211, 153, 0.3) !important;
+            color: #34D399 !important;
+        }
         /* ----------------------------------------------------------- */
 
 
