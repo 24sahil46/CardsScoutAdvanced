@@ -56,14 +56,15 @@ def render_guest_scout():
         }
 
         /* ----------------------------------------------------------- */
-        /* --- THE PERFECT INPUT FIELD FIX --- */
+        /* --- THE PERFECT INPUT FIELD FIX (CLOUD-PROOF) --- */
         
+        /* 1. The Outer Wrapper: Gets the transparent glass effect */
         div[data-baseweb="input"],
         div[data-baseweb="select"] > div,
-        [data-testid="stNumberInputStepDown"],
-        [data-testid="stNumberInputStepUp"] {
-            background-color: rgba(10, 15, 20, 0.75) !important; 
-            backdrop-filter: blur(6px) !important; 
+        div[data-testid="stNumberInputContainer"] {
+            background-color: rgba(10, 20, 15, 0.3) !important; 
+            backdrop-filter: blur(12px) !important; 
+            -webkit-backdrop-filter: blur(12px) !important;
             border-color: rgba(255, 255, 255, 0.15) !important;
             transition: all 0.3s ease !important;
         }
@@ -74,27 +75,35 @@ def render_guest_scout():
         div[data-baseweb="select"] > div:hover,
         div[data-baseweb="input"]:focus-within {
             border-color: #34D399 !important; 
-            background-color: rgba(15, 22, 28, 0.85) !important;
+            background-color: rgba(15, 22, 28, 0.6) !important;
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.3) !important;
         }
 
+        /* 2. The Inner Elements: Must be forced transparent to block Cloud Theme overrides */
         div[data-baseweb="base-input"],
         div[data-baseweb="base-input"] > input,
-        div[data-baseweb="base-input"] > textarea {
+        div[data-baseweb="base-input"] > textarea,
+        input[class*="st-"], 
+        input[type="text"], 
+        input[type="number"] {
             background-color: transparent !important;
             background: transparent !important;
             border: none !important;
+            color: #F8FAFC !important;
         }
-        
-        input, .stSelectbox div, [data-testid="stNumberInputStepDown"], [data-testid="stNumberInputStepUp"] { 
-            color: #F8FAFC !important; 
+
+        /* 3. Number Input Plus/Minus Buttons */
+        [data-testid="stNumberInputStepDown"],
+        [data-testid="stNumberInputStepUp"] {
+            background-color: transparent !important;
+            background: transparent !important;
+            color: #F8FAFC !important;
         }
 
         [data-testid="stNumberInputStepDown"]:hover,
         [data-testid="stNumberInputStepUp"]:hover {
             color: #34D399 !important;
             background-color: rgba(52, 211, 153, 0.15) !important;
-            border-color: #34D399 !important;
         }
         /* ----------------------------------------------------------- */
 
