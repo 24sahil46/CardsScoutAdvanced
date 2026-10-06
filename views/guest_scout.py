@@ -50,53 +50,73 @@ def render_guest_scout():
         }
 
        /* ----------------------------------------------------------- */
-        /* --- 2. INPUT FIELDS (Match "Add Other Category" Button) --- */
+        /* --- 2. INPUT FIELDS & REACT PORTALS --- */
         
-        /* 1. Exact match to your button color */
-        div[data-baseweb="input"],
-        div[data-baseweb="select"] > div {
+        /* 1. Force translucent glass directly onto the base Streamlit widgets */
+        .stTextInput > div > div > div,
+        .stNumberInput > div > div > div,
+        .stSelectbox > div > div > div,
+        .stMultiSelect > div > div > div {
             background-color: rgba(255, 255, 255, 0.1) !important;
             background: rgba(255, 255, 255, 0.1) !important;
             border: 1px solid rgba(255, 255, 255, 0.15) !important;
             border-radius: 8px !important;
+        }
+
+        /* 2. Nuke the grey backgrounds from the actual typing areas */
+        .stTextInput input,
+        .stNumberInput input,
+        [data-baseweb="base-input"] {
+            background-color: transparent !important;
+            background: transparent !important;
+            color: #FFFFFF !important;
+            -webkit-text-fill-color: #FFFFFF !important;
+        }
+
+        /* 3. FIX THE DETACHED DROPDOWN MENU (The React Portal) */
+        /* This targets the teleported dropdown box that appears when clicked */
+        div[data-baseweb="popover"] > div,
+        ul[data-baseweb="menu"] {
+            background-color: #0b110e !important; /* Solid dark theme color */
+            background: #0b110e !important;
+            border: 1px solid rgba(52, 211, 153, 0.3) !important;
+            border-radius: 8px !important;
+        }
+
+        /* Dropdown Options */
+        li[role="option"] {
+            background-color: transparent !important;
+            background: transparent !important;
             color: #FFFFFF !important;
             transition: all 0.2s ease !important;
         }
 
-        /* 2. Nuke the internal grey backgrounds completely */
-        div[data-baseweb="base-input"],
-        div[data-baseweb="base-input"] > input,
-        div[data-baseweb="base-input"] > textarea,
-        input {
-            background-color: transparent !important;
-            background: transparent !important;
-            color: #FFFFFF !important;
-            border: none !important;
-            box-shadow: none !important;
+        /* When hovering over an option in the dropdown */
+        li[role="option"]:hover,
+        li[role="option"][aria-selected="true"] {
+            background-color: rgba(52, 211, 153, 0.2) !important;
+            background: rgba(52, 211, 153, 0.2) !important;
+            color: #34D399 !important;
         }
 
-        /* 3. Hover & Focus state */
-        div[data-baseweb="input"]:hover,
-        div[data-baseweb="select"] > div:hover,
-        div[data-baseweb="input"]:focus-within {
+        /* Hover & Focus state for the main boxes */
+        .stTextInput > div > div > div:hover,
+        .stSelectbox > div > div > div:hover,
+        .stTextInput > div > div > div:focus-within,
+        .stSelectbox > div > div > div:focus-within {
             background-color: rgba(255, 255, 255, 0.15) !important;
             background: rgba(255, 255, 255, 0.15) !important;
-            border-color: rgba(255, 255, 255, 0.4) !important;
+            border-color: rgba(52, 211, 153, 0.4) !important;
         }
 
-        /* 4. Number Input Buttons */
+        /* Number Input (+ / -) Buttons */
         [data-testid="stNumberInputStepDown"],
         [data-testid="stNumberInputStepUp"] {
-            background-color: transparent !important;
+            background: transparent !important;
             color: #FFFFFF !important;
-            border: none !important;
-        }
-        [data-testid="stNumberInputStepDown"]:hover,
-        [data-testid="stNumberInputStepUp"]:hover {
-            background-color: rgba(255, 255, 255, 0.1) !important;
         }
 
-        /* 5. Dropdown SVG icon */
+        /* Dropdown SVG Arrow */
         svg[data-baseweb="icon"] { fill: #FFFFFF !important; }
         /* ----------------------------------------------------------- */
 
