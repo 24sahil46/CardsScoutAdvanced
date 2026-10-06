@@ -27,8 +27,8 @@ def render_optimization_hub():
     # --- VAULT MASTER THEME INJECTION ---
     st.markdown("""
         <style>
-        /* ISOLATED VAULT TYPOGRAPHY (Fixes CSS Bleed) */
-        .vault-title {
+        /* Sleek Typography */
+        .scout-title {
             font-family: 'Inter', -apple-system, sans-serif !important;
             font-size: 3.2rem !important;
             font-weight: 700 !important;
@@ -36,12 +36,11 @@ def render_optimization_hub():
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
             line-height: 1.1 !important;
-            color: #FFFFFF !important;
             text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6), 0px 0px 40px rgba(52, 211, 153, 0.2) !important;
         }
-        .vault-subtitle {
+        .scout-subtitle {
             font-family: 'Inter', -apple-system, sans-serif !important;
-            color: #D4AF37 !important; /* Perfect Gold Match */
+            color: #F8FAFC !important; 
             font-size: 0.95rem !important;
             letter-spacing: 3px !important;
             font-weight: 600 !important;
@@ -61,7 +60,7 @@ def render_optimization_hub():
             box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
         }
 
-        /* 2. SOLID DARK INPUT FIELDS (Fixes Grey Cloud Override) */
+        /* 2. SOLID DARK INPUT FIELDS */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
         .stSelectbox > div > div > div,
@@ -77,16 +76,13 @@ def render_optimization_hub():
         .stNumberInput input,
         [data-baseweb="base-input"] {
             background-color: transparent !important;
-            background: transparent !important;
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important;
         }
 
-        /* Fix the React Portals (Dropdown Menus) */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
             background-color: #08100C !important; 
-            background: #08100C !important;
             border: 1px solid rgba(52, 211, 153, 0.3) !important;
             border-radius: 8px !important;
         }
@@ -111,15 +107,25 @@ def render_optimization_hub():
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.2) !important;
         }
 
-        /* 3. FIX OVERLAPPING ARROW BUGS */
-        /* Nuke the broken text node entirely */
+        /* 3. FIX OVERLAPPING ICON TEXT BUGS (Expander & Password Eye) */
+        /* Nuke the broken expander arrow */
         [data-testid="stExpanderToggleIcon"] { 
             display: none !important; 
             font-size: 0px !important;
             color: transparent !important;
         }
         [data-testid="stExpander"] summary span {
-            color: transparent !important; /* Bleaches the broken text */
+            color: transparent !important; 
+        }
+        
+        /* Nuke the broken "visibility" text in password fields */
+        [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child {
+            color: transparent !important; 
+            font-size: 0px !important;
+        }
+        /* Ensure if an SVG successfully loads, it stays visible */
+        [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child svg {
+            fill: #94A3B8 !important;
         }
 
         /* 4. PRIMARY & SECONDARY BUTTONS */
@@ -417,7 +423,7 @@ def render_optimization_hub():
             st.write("Route your recurring bills to your highest-yielding cards.")
             
             if not st.session_state.wallet:
-                st.warning("⚠️️ Please add at least one card to your Digital Wallet above to optimize subscriptions.")
+                st.warning("⚠ Please add at least one card to your Digital Wallet above to optimize subscriptions.")
             else:
                 c1, c2, c3, c4 = st.columns([2, 1, 1.5, 1])
                 sub_name = c1.text_input("Service Name", placeholder="e.g., Netflix")
