@@ -250,13 +250,11 @@ def render_optimization_hub():
             color: #F8FAFC !important;
             font-weight: 600 !important;
         }
-        /* THE ULTIMATE VISIBILITY TEXT DESTROYER */
-        button[kind="header"] svg, 
-        [data-baseweb="input"] button {
+        /* Completely hide Streamlit's native password eye icon / visibility text element */
+        [data-baseweb="input"] > div:last-child:has(svg),
+        [data-baseweb="input"] > div:last-child:has(button) {
             display: none !important;
         }
-        
-        /* Hides the exact fallback text container */
         [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child {
             display: none !important;
         }
@@ -691,9 +689,31 @@ def render_optimization_hub():
                 title_placeholder.markdown(f"<h3 style='text-align: center; color: #E2E8F0; margin-bottom: 25px;'>{clean_title}</h3>", unsafe_allow_html=True)
                 
                 username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., sahil_wealth", key="login_username")
+                
+                # Persistent Session State tracker for password text
+                if "raw_password_input" not in st.session_state:
+                    st.session_state.raw_password_input = ""
 
-# Clean, standard password input without buggy checkboxes
-                password = st.text_input("🔑 Security Clearance (Password)", type="password", placeholder="Enter your secret passcode", key="login_password")
+                # Toggle state tracker
+                if "show_pwd_checkbox" not in st.session_state:
+                    st.session_state.show_pwd_checkbox = False
+
+                st.markdown("🔑 **Security Clearance (Password)**")
+                
+                # Standard text input that safely saves to session state
+                pwd_input = st.text_input(
+                    "Password", 
+                    value=st.session_state.raw_password_input, 
+                    type="default" if st.session_state.show_pwd_checkbox else "password", 
+                    placeholder="Enter your secret passcode", 
+                    label_visibility="collapsed",
+                    key="sync_password_box"
+                )
+                st.session_state.raw_password_input = pwd_input
+                password = st.session_state.raw_password_input
+
+                # Clean 'Show password' checkbox underneath
+                st.session_state.show_pwd_checkbox = st.checkbox("Show password", value=st.session_state.show_pwd_checkbox)
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 
