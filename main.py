@@ -5,7 +5,7 @@ import os
 from config.settings import APP_SETTINGS
 
 # 1. Page Configuration
-st.set_page_config(page_title="CardScout AI", page_icon="🧭", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="CardScout AI", page_icon="💎", layout="wide", initial_sidebar_state="collapsed")
 st.markdown("""
     <style>
     /* 1. Hide the empty default Streamlit header */
@@ -64,7 +64,7 @@ def set_main_background():
             </style>
         """, unsafe_allow_html=True)
     else:
-        st.error(f"🚨 Background image '{bg_file}' not found! Please ensure it is renamed correctly.")
+        st.error(f"⚠️️ Background image '{bg_file}' not found! Please ensure it is renamed correctly.")
 
 set_main_background()
 
@@ -86,9 +86,10 @@ st.markdown("""
     <div class='nav-divider'></div>
 """, unsafe_allow_html=True)
 
-# --- Navigation CSS (Includes fixes for dropdown arrow) ---
+# --- Navigation CSS (MATCH SOLID DARK THEME) ---
 st.markdown("""
     <style>
+    /* Hide native popover arrow */
     button[data-testid="stPopoverButton"] span.material-symbols-rounded,
     button[data-testid="stPopoverButton"] [data-testid="stIconMaterial"],
     button[data-testid="stPopoverButton"] svg {
@@ -100,49 +101,53 @@ st.markdown("""
         overflow: hidden !important;
     }
 
+    /* GLOBAL NAV BUTTON STYLES (Solid Dark #08100C) */
     div[data-testid="column"]:nth-child(3) button,
     div[data-testid="column"]:nth-child(4) button,
     div[data-testid="column"]:nth-child(5) button {
         border-radius: 30px !important;
         min-height: 42px !important;
-        font-weight: 500 !important;
+        font-weight: 600 !important;
         font-size: 0.95rem !important;
         transition: all 0.3s ease !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
-    }
-
-    div[data-testid="column"]:nth-child(3) button {
-        background-color: rgba(16, 185, 129, 0.08) !important;
-        border: 1px solid rgba(16, 185, 129, 0.4) !important;
-        color: #E2E8F0 !important;
-    }
-    div[data-testid="column"]:nth-child(3) button:hover {
-        background-color: rgba(16, 185, 129, 0.15) !important;
-        border-color: #10B981 !important;
-    }
-
-    div[data-testid="column"]:nth-child(4) button {
-        background-color: rgba(191, 166, 122, 0.15) !important;
-        border: 1px solid rgba(191, 166, 122, 0.6) !important;
-        color: #F8FAFC !important;
-    }
-    div[data-testid="column"]:nth-child(4) button:hover {
-        background-color: rgba(191, 166, 122, 0.25) !important;
-    }
-
-    div[data-testid="column"]:nth-child(5) button {
-        background-color: rgba(255, 255, 255, 0.03) !important;
+        background-color: #08100C !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        color: #BFA67A !important;
+        color: #94A3B8 !important;
     }
+
+    /* HOVER STATE -> Mint Green */
+    div[data-testid="column"]:nth-child(3) button:hover,
+    div[data-testid="column"]:nth-child(4) button:hover,
     div[data-testid="column"]:nth-child(5) button:hover {
-        background-color: rgba(255, 255, 255, 0.08) !important;
-        border-color: rgba(191, 166, 122, 0.5) !important;
+        background-color: rgba(52, 211, 153, 0.1) !important;
+        border-color: #34D399 !important;
+        color: #34D399 !important;
+        box-shadow: 0 0 10px rgba(52, 211, 153, 0.15) !important;
     }
     </style>
 """, unsafe_allow_html=True)
+
+# --- DYNAMIC ACTIVE PAGE HIGHLIGHT ---
+active_css = ""
+if st.session_state.current_page == "Home":
+    active_css = "div[data-testid='column']:nth-child(3) button"
+elif st.session_state.current_page == "Optimization Hub":
+    active_css = "div[data-testid='column']:nth-child(4) button"
+    
+if active_css:
+    st.markdown(f"""
+        <style>
+        {active_css} {{
+            background-color: rgba(52, 211, 153, 0.15) !important;
+            border-color: #34D399 !important;
+            color: #34D399 !important;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.2) !important;
+        }}
+        </style>
+    """, unsafe_allow_html=True)
 
 nav_brand, nav_space, nav_home, nav_hub, nav_copilot = st.columns([3.5, 3.5, 1.2, 1.2, 2.5])
 
@@ -171,7 +176,7 @@ with nav_copilot:
         st.caption("Ask quick purchase questions (e.g., 'Spending ₹4,500 on Swiggy')")
 
         if not st.session_state.get('logged_in', False):
-            st.warning("🔒 Please login to The Vault and add your cards to use the Co-Pilot.")
+            st.warning("⚠️ Please login to The Vault and add your cards to use the Co-Pilot.")
         else:
             if "copilot_messages" not in st.session_state:
                 st.session_state.copilot_messages = []
@@ -311,7 +316,7 @@ if st.session_state.current_page == "Home":
                         align-items: center;
                         text-align: center;
                     ">
-                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC; text-shadow: 0 2px 6px rgba(0,0,0,1);'>🚀 Guest Scout</h3>
+                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC; text-shadow: 0 2px 6px rgba(0,0,0,1);'>🧭 Guest Scout</h3>
                         <p style='color: #E2E8F0; font-size: 0.95rem; line-height: 1.5; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,1);'>Analyze your expenditure profile to discover your highest-yielding credit card match.</p>
                     </div>
                 </div>
