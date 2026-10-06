@@ -62,7 +62,7 @@ def set_main_background():
             </style>
         """, unsafe_allow_html=True)
     else:
-        st.error(f"⚠️ Background image '{bg_file}' not found! Please ensure it is renamed correctly.")
+        st.error(f"⚠️️ Background image '{bg_file}' not found! Please ensure it is renamed correctly.")
 
 set_main_background()
 
@@ -251,9 +251,8 @@ if st.session_state.current_page == "Home":
                 line-height: 1.1 !important;
                 text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6), 0px 0px 40px rgba(16, 185, 129, 0.2) !important;
             }
-            .hero-subtitle-sleek {
+            div.hero-subtitle-sleek {
                 font-family: 'Inter', -apple-system, sans-serif !important;
-                color: #D4AF37 !important; 
                 font-size: 1.05rem !important;
                 letter-spacing: 3px !important;
                 font-weight: 600 !important; 
@@ -265,7 +264,8 @@ if st.session_state.current_page == "Home":
                 <h1 class='hero-title-sleek'>
                     <span style='color: #FFFFFF;'>Card</span><span style='color: #34D399;'>Scout</span>
                 </h1>
-                <p class='hero-subtitle-sleek'>SMART DECISIONS, SMARTER REWARDS.</p>
+                <!-- Changed to DIV and forced inline color to beat theme.css global rules -->
+                <div class='hero-subtitle-sleek' style='color: #D4AF37 !important;'>SMART DECISIONS, SMARTER REWARDS.</div>
             </div>
         """, unsafe_allow_html=True)
         
@@ -315,8 +315,8 @@ if st.session_state.current_page == "Home":
                         align-items: center;
                         text-align: center;
                     ">
-                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC; text-shadow: 0 2px 6px rgba(0,0,0,1);'>🧭 Guest Scout</h3>
-                        <p style='color: #E2E8F0; font-size: 0.95rem; line-height: 1.5; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,1);'>Analyze your expenditure profile to discover your highest-yielding credit card match.</p>
+                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC !important; text-shadow: 0 2px 6px rgba(0,0,0,1);'>🧭 Guest Scout</h3>
+                        <div style='color: #E2E8F0 !important; font-size: 0.95rem; line-height: 1.5; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,1);'>Analyze your expenditure profile to discover your highest-yielding credit card match.</div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -355,8 +355,8 @@ if st.session_state.current_page == "Home":
                         align-items: center;
                         text-align: center;
                     ">
-                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC; text-shadow: 0 2px 6px rgba(0,0,0,1);'>💎 The Obsidian Vault</h3>
-                        <p style='color: #E2E8F0; font-size: 0.95rem; line-height: 1.5; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,1);'>Access your secure portfolio to track rewards, monitor yields, and optimize benefits.</p>
+                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC !important; text-shadow: 0 2px 6px rgba(0,0,0,1);'>💎 The Obsidian Vault</h3>
+                        <div style='color: #E2E8F0 !important; font-size: 0.95rem; line-height: 1.5; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,1);'>Access your secure portfolio to track rewards, monitor yields, and optimize benefits.</div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
