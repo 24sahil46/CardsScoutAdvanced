@@ -8,7 +8,7 @@ def render_guest_scout():
     if 'user_data' not in st.session_state:
         st.session_state.user_data = {}
 
-    # --- THE MASTER UI OVERHAUL ---
+    # --- GUEST SCOUT MASTER THEME INJECTION (OBSIDIAN VAULT SYNC) ---
     st.markdown("""
         <style>
         /* Sleek Typography */
@@ -20,16 +20,17 @@ def render_guest_scout():
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
             line-height: 1.1 !important;
-            text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6), 0px 0px 40px rgba(16, 185, 129, 0.2) !important;
+            text-shadow: 0px 4px 20px rgba(0, 0, 0, 0.6), 0px 0px 40px rgba(52, 211, 153, 0.2) !important;
         }
         .scout-subtitle {
             font-family: 'Inter', -apple-system, sans-serif !important;
-            color: #D4AF37 !important; 
+            color: #F8FAFC !important; 
             font-size: 0.95rem !important;
             letter-spacing: 3px !important;
             font-weight: 600 !important;
             margin-top: 5px !important;
             text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.8) !important;
+            text-transform: uppercase !important;
         }
 
         /* 1. MASTER CONTAINER (Dark Frosted Glass Overlay) */
@@ -49,9 +50,7 @@ def render_guest_scout():
             font-size: 0.9rem !important;
         }
 
-        /* ----------------------------------------------------------- */
-        /* --- 2. SOLID DARK INPUT FIELDS (Synced with Vault) --- */
-        
+        /* 2. SOLID DARK INPUT FIELDS (Fixes Grey Cloud Override) */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
         .stSelectbox > div > div > div,
@@ -62,7 +61,7 @@ def render_guest_scout():
             border-radius: 8px !important;
             transition: all 0.2s ease !important;
         }
-        
+
         .stTextInput input,
         .stNumberInput input,
         [data-baseweb="base-input"] {
@@ -72,7 +71,7 @@ def render_guest_scout():
             -webkit-text-fill-color: #FFFFFF !important;
         }
 
-        /* Dropdown Menus */
+        /* Fix the React Portals (Dropdown Menus) */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
             background-color: #08100C !important; 
@@ -95,28 +94,36 @@ def render_guest_scout():
         .stTextInput > div > div > div:hover,
         .stSelectbox > div > div > div:hover,
         .stTextInput > div > div > div:focus-within,
-        .stSelectbox > div > div > div:focus-within {
+        .stSelectbox > div > div > div:focus-within,
+        .stMultiSelect > div > div > div:hover,
+        .stMultiSelect > div > div > div:focus-within {
             background-color: #0A1611 !important;
             border-color: #34D399 !important;
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.2) !important;
         }
 
-        [data-testid="stNumberInputStepDown"],
-        [data-testid="stNumberInputStepUp"] {
-            background-color: transparent !important;
-            color: #FFFFFF !important;
-            border: none !important;
+        /* 3. FIX OVERLAPPING ICON TEXT BUGS */
+        [data-testid="stExpanderToggleIcon"] { 
+            display: none !important; 
+            font-size: 0px !important;
+            color: transparent !important;
         }
-        [data-testid="stNumberInputStepDown"]:hover,
-        [data-testid="stNumberInputStepUp"]:hover {
-            color: #34D399 !important;
+        [data-testid="stExpander"] summary span {
+            color: transparent !important; 
         }
-        
+
+        [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) {
+            color: transparent !important; 
+            font-size: 0px !important;
+            line-height: 0 !important;
+        }
+        [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) svg {
+            fill: #94A3B8 !important;
+        }
+
         svg[data-baseweb="icon"] { fill: #FFFFFF !important; }
 
-        /* ----------------------------------------------------------- */
-        /* --- 3. PRIMARY & SECONDARY BUTTONS (Synced with Vault Nav) --- */
-        
+        /* 4. PRIMARY & SECONDARY BUTTONS (This auto-fixes the Top Nav) */
         button[kind="primary"] {
             background-color: #34D399 !important; 
             color: #040D08 !important; 
@@ -128,7 +135,6 @@ def render_guest_scout():
             box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2) !important;
             transition: all 0.2s ease !important;
         }
-        
         button[kind="primary"]:hover {
             background-color: #2bb381 !important; 
             transform: translateY(-2px) !important;
@@ -136,37 +142,59 @@ def render_guest_scout():
             color: #000000 !important;
         }
         
-        /* Sleek Hollow Pills for Top Navigator */
         button[kind="secondary"] {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: #FFFFFF !important;
             border-radius: 30px !important;
             font-weight: 600 !important;
-            transition: all 0.2s ease !important;
+            transition: all 0.3s ease !important;
         }
-        
-        /* Mint Green Highlight for Hover & Active Nav State */
-        button[kind="secondary"]:hover,
-        button[kind="secondary"]:focus,
-        button[kind="secondary"]:active {
-            background-color: rgba(52, 211, 153, 0.1) !important;
+        button[kind="secondary"]:hover {
+            background-color: rgba(52, 211, 153, 0.15) !important;
             border-color: #34D399 !important;
             color: #34D399 !important;
-            box-shadow: 0 0 10px rgba(52, 211, 153, 0.15) !important;
         }
 
-        /* ----------------------------------------------------------- */
-        /* --- 4. DASHBOARD INTELLIGENCE HUB STYLING --- */
+        /* Number Input (+ / -) Buttons */
+        [data-testid="stNumberInputStepDown"],
+        [data-testid="stNumberInputStepUp"] {
+            background: transparent !important;
+            color: #FFFFFF !important;
+            border: none !important;
+        }
+        [data-testid="stNumberInputStepDown"]:hover,
+        [data-testid="stNumberInputStepUp"]:hover {
+            color: #34D399 !important;
+        }
 
+        /* Checkbox & Radio Alignment */
+        div[role="radiogroup"] {
+            gap: 15px !important;
+        }
+        div[role="radiogroup"] > label {
+            background-color: #08100C !important;
+            padding: 10px 20px !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(52, 211, 153, 0.3) !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+        }
+        div[role="radiogroup"] > label:hover {
+            border-color: #34D399 !important;
+        }
+        div[role="radiogroup"] > label[aria-checked="true"] {
+            background: rgba(52, 211, 153, 0.15) !important;
+            border-color: #34D399 !important;
+        }
+
+        /* --- DASHBOARD INTELLIGENCE HUB STYLING (For Step 3) --- */
         [data-testid="stStatusWidget"] {
-            background: linear-gradient(145deg, rgba(10, 20, 15, 0.6), rgba(4, 13, 8, 0.8)) !important;
-            backdrop-filter: blur(12px) !important;
+            background: #08100C !important;
             border: 1px solid rgba(52, 211, 153, 0.2) !important;
             border-radius: 12px !important;
             box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important;
         }
-        
         [data-testid="stStatusWidget"] details,
         [data-testid="stStatusWidget"] summary {
             background-color: transparent !important;
@@ -174,10 +202,6 @@ def render_guest_scout():
             color: #F8FAFC !important;
         }
         
-        [data-testid="stStatusWidget"] summary:hover {
-            background-color: rgba(52, 211, 153, 0.1) !important;
-        }
-
         [data-testid="stNotification"] {
             background-color: rgba(220, 38, 38, 0.15) !important;
             backdrop-filter: blur(6px) !important;
@@ -199,7 +223,7 @@ def render_guest_scout():
         </style>
     """, unsafe_allow_html=True)
 
-# --- PAGE 1: PROFILE SCOUT ---
+    # --- PAGE 1: PROFILE SCOUT ---
     if st.session_state.step == 1:
         data = st.session_state.user_data
         
@@ -212,12 +236,12 @@ def render_guest_scout():
                     <h1 class='scout-title'>
                         <span style='color: #FFFFFF;'>Card</span><span style='color: #34D399;'>Scout</span>
                     </h1>
-                    <p class='scout-subtitle'>SMART DECISIONS, SMARTER REWARDS.</p>
+                    <p class='scout-subtitle'>Smart Decisions, Smarter Rewards</p>
                 </div>
                 """, unsafe_allow_html=True)
                 
                 st.markdown("""
-                    <div style="background: linear-gradient(90deg, rgba(52, 211, 153, 0.15), rgba(4, 13, 8, 0)); border-left: 4px solid #34D399; padding: 12px 20px; border-radius: 4px; margin-bottom: 25px;">
+                    <div style="background: rgba(52, 211, 153, 0.1); border-left: 4px solid #34D399; padding: 12px 20px; border-radius: 4px; margin-bottom: 25px;">
                         <span style="color: #34D399; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px;">STEP 1 //</span>
                         <span style="color: #F8FAFC; font-weight: 500; font-size: 1.1rem; margin-left: 8px;">BASIC PROFILE</span>
                     </div>
@@ -252,6 +276,7 @@ def render_guest_scout():
                 credit_options = ["< 700", "700 - 750", "> 750","Don't Know"]
                 prev_credit = data.get('credit', "< 700")
                 credit_index = credit_options.index(prev_credit) if prev_credit in credit_options else 0
+                
                 credit = st.radio("Estimated Credit Score", credit_options, index=credit_index, horizontal=True)
 
                 st.divider()
@@ -293,8 +318,8 @@ def render_guest_scout():
                 """, unsafe_allow_html=True)
                 
                 st.markdown("""
-                    <div style="background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), rgba(4, 13, 8, 0)); border-left: 4px solid #D4AF37; padding: 12px 20px; border-radius: 4px; margin-bottom: 25px;">
-                        <span style="color: #D4AF37; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px;">STEP 2 //</span>
+                    <div style="background: rgba(52, 211, 153, 0.1); border-left: 4px solid #34D399; padding: 12px 20px; border-radius: 4px; margin-bottom: 25px;">
+                        <span style="color: #34D399; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px;">STEP 2 //</span>
                         <span style="color: #F8FAFC; font-weight: 500; font-size: 1.1rem; margin-left: 8px;">SPENDING HABITS</span>
                     </div>
                 """, unsafe_allow_html=True)
@@ -330,7 +355,7 @@ def render_guest_scout():
                     if custom_name:
                         spend_values[custom_name] = custom_amt
 
-                if st.button("Add Other Category"):
+                if st.button("Add Other Category", type="secondary"):
                     st.session_state.custom_rows += 1
                     st.rerun()
 
@@ -382,7 +407,7 @@ def render_guest_scout():
                 st.divider()
                 col_back, col_space, col_next = st.columns([3, 4, 3])
                 
-                if col_back.button("Back", type="primary", use_container_width=True):
+                if col_back.button("Back", type="secondary", use_container_width=True):
                     st.session_state.step = 1
                     st.rerun()
                     
@@ -435,10 +460,10 @@ def render_guest_scout():
         # Sidebar Snapshot
         with st.sidebar:
             st.markdown(f"""
-                <div style="background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(4, 13, 8, 0.4)); border: 1px solid rgba(52, 211, 153, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                <div style="background: #08100C; border: 1px solid rgba(52, 211, 153, 0.3); border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center;">
                     <div style="font-size: 2.5rem; margin-bottom: 5px;">👤</div>
                     <div style="color: #F8FAFC; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px;">{data.get('name', 'User').upper()}</div>
-                    <div style="display: inline-block; background: #D4AF37; color: #0b121e; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; margin-top: 5px;">Verified Profile</div>
+                    <div style="display: inline-block; background: #34D399; color: #0b121e; font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; margin-top: 5px;">Verified Profile</div>
                 </div>
             """, unsafe_allow_html=True)
             
@@ -447,7 +472,7 @@ def render_guest_scout():
                 st.write(f"**Name:** {data.get('name', 'User')}")
                 st.write(f"**Monthly Income:** ₹{data.get('income', 0):,}")
 
-            if st.button("Edit Profile", use_container_width=True):
+            if st.button("Edit Profile", type="secondary", use_container_width=True):
                 if "final_recommendation" in st.session_state:
                     del st.session_state.final_recommendation
                 st.session_state.step = 1
@@ -470,18 +495,18 @@ def render_guest_scout():
                 odds, status, color = ("35%", "Challenging", "inverse") if score == "< 700" else ("85%", "Strong", "normal")
                 st.metric(label="Likelihood for Top Pick", value=odds, delta=status, delta_color=color)
 
-        @st.dialog("⚔️️ Card Battle: Peer-to-Peer Analysis", width="large")
+        @st.dialog("⚔️ Card Battle: Peer-to-Peer Analysis", width="large")
         def battle_popup(entered_card, original_recommendation, user_context):
             st.write(f"### 🏆 Our Top Pick vs. {entered_card}")
             with st.spinner("Analyzing battle metrics..."):
                 analysis = generate_battle_analysis(entered_card, original_recommendation, user_context)
                 st.markdown(analysis)
-            if st.button("Close Analysis", use_container_width=True):
+            if st.button("Close Analysis", type="secondary", use_container_width=True):
                 st.rerun()
 
         with col_battle:
             with st.container(border=True):
-                st.markdown("<h3 style='color: #D4AF37; font-size: 1.1rem; margin-bottom: 5px;'>🤖 The Battleground</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='color: #34D399; font-size: 1.1rem; margin-bottom: 5px;'>🤖 The Battleground</h3>", unsafe_allow_html=True)
                 st.write("Compare cards vs. Our Top pick.")
                 user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed")
                 if st.button("Battle Now", type="primary", use_container_width=True):
@@ -492,7 +517,7 @@ def render_guest_scout():
         st.markdown("---")
         if "final_recommendation" in st.session_state:
             st.markdown("""
-                <h2 style="color: #F8FAFC; border-left: 5px solid #D4AF37; padding-left: 15px;">Strategic Credit Acquisition Roadmap</h2>
+                <h2 style="color: #F8FAFC; border-left: 5px solid #34D399; padding-left: 15px;">Strategic Credit Acquisition Roadmap</h2>
             """, unsafe_allow_html=True)
             st.markdown(st.session_state.final_recommendation)
             
@@ -502,7 +527,7 @@ def render_guest_scout():
         
         c1, c2, c3 = st.columns(3)
         
-        if c1.button("Start New Scout", use_container_width=True, key="reset_p3"):
+        if c1.button("Start New Scout", type="secondary", use_container_width=True, key="reset_p3"):
             if "final_recommendation" in st.session_state:
                 del st.session_state.final_recommendation
             st.session_state.step = 1
@@ -516,10 +541,11 @@ def render_guest_scout():
                     data=pdf_bytes, 
                     file_name=f"CardScout_{data.get('name', 'User')}.pdf", 
                     mime="application/pdf", 
-                    use_container_width=True
+                    use_container_width=True,
+                    type="secondary"
                 )
             else:
-                c2.button("⚠️ PDF Error", disabled=True, use_container_width=True)
+                c2.button("⚠️ PDF Error", type="secondary", disabled=True, use_container_width=True)
 
         deploy_url, wa_url, mail_url = get_share_links(data.get('occ', 'Professional'))
         
