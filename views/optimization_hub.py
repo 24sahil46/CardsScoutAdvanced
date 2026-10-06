@@ -60,7 +60,7 @@ def render_optimization_hub():
             box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
         }
 
-        /* 2. SOLID DARK INPUT FIELDS (Fixes Grey Cloud Override) */
+        /* 2. SOLID DARK INPUT FIELDS */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
         .stSelectbox > div > div > div,
@@ -76,16 +76,13 @@ def render_optimization_hub():
         .stNumberInput input,
         [data-baseweb="base-input"] {
             background-color: transparent !important;
-            background: transparent !important;
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important;
         }
 
-        /* Fix the React Portals (Dropdown Menus) */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
             background-color: #08100C !important; 
-            background: #08100C !important;
             border: 1px solid rgba(52, 211, 153, 0.3) !important;
             border-radius: 8px !important;
         }
@@ -110,12 +107,16 @@ def render_optimization_hub():
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.2) !important;
         }
 
-        /* 3. FIX OVERLAPPING TEXT BUGS */
-        /* Hide the native expander arrow that renders as raw text on the cloud */
+        /* 3. FIX OVERLAPPING ARROW BUGS */
+        /* Nuke the broken text node entirely */
         [data-testid="stExpanderToggleIcon"] { 
             display: none !important; 
+            font-size: 0px !important;
+            color: transparent !important;
         }
-        svg[data-baseweb="icon"] { fill: #FFFFFF !important; }
+        [data-testid="stExpander"] summary span {
+            color: transparent !important; /* Bleaches the broken text */
+        }
 
         /* 4. PRIMARY & SECONDARY BUTTONS */
         button[kind="primary"] {
@@ -167,22 +168,26 @@ def render_optimization_hub():
             color: #F8FAFC !important;
         }
 
-        /* 6. EXPANDER STYLING (Digital Wallet) */
+        /* 6. EXPANDER STYLING (Digital Wallet Theme Match) */
         [data-testid="stExpander"] {
             background-color: #08100C !important;
-            border: 1px solid rgba(52, 211, 153, 0.2) !important;
+            border: 1px solid rgba(52, 211, 153, 0.3) !important;
             border-radius: 8px !important;
         }
         [data-testid="stExpander"] summary {
             background-color: transparent !important;
-            color: #F8FAFC !important;
-            font-weight: 600 !important;
         }
-        [data-testid="stExpander"] summary:hover {
-            color: #34D399 !important;
+        [data-testid="stExpander"] summary p {
+            color: #34D399 !important; /* Exact match to your mint theme */
+            font-weight: 700 !important;
+            font-size: 1.05rem !important;
+            visibility: visible !important;
+        }
+        [data-testid="stExpander"] summary:hover p {
+            color: #F8FAFC !important;
         }
 
-        /* 7. AUTH RADIO BUTTONS (Mint Green Theme) */
+        /* 7. AUTH RADIO BUTTONS */
         div[role="radiogroup"] {
             justify-content: center !important;
             gap: 15px !important;
@@ -216,6 +221,18 @@ def render_optimization_hub():
         div[role="radiogroup"] > label[aria-checked="true"] p {
             color: #040D08 !important;
             font-weight: 700 !important;
+        }
+        
+        /* 8. SUCCESS ALERTS (Welcome Message Theme Match) */
+        [data-testid="stAlert"] {
+            background-color: rgba(52, 211, 153, 0.1) !important;
+            border: 1px solid rgba(52, 211, 153, 0.3) !important;
+            border-radius: 8px !important;
+            color: #F8FAFC !important;
+        }
+        [data-testid="stAlert"] div[data-testid="stMarkdownContainer"] p {
+            color: #F8FAFC !important;
+            font-weight: 600 !important;
         }
         </style>
     """, unsafe_allow_html=True)
