@@ -8,10 +8,12 @@ def render_guest_scout():
     if 'user_data' not in st.session_state:
         st.session_state.user_data = {}
 
-    # --- GUEST SCOUT MASTER THEME INJECTION (OBSIDIAN VAULT SYNC) ---
+    # ==========================================
+    # GUEST SCOUT MASTER THEME (CLEAN REWRITE)
+    # ==========================================
     st.markdown("""
         <style>
-        /* Sleek Typography */
+        /* --- 1. TYPOGRAPHY & HEADINGS --- */
         .scout-title {
             font-family: 'Inter', -apple-system, sans-serif !important;
             font-size: 3.2rem !important;
@@ -24,7 +26,7 @@ def render_guest_scout():
         }
         .scout-subtitle {
             font-family: 'Inter', -apple-system, sans-serif !important;
-            color: #D4AF37 !important; 
+            color: #F8FAFC !important; 
             font-size: 0.95rem !important;
             letter-spacing: 3px !important;
             font-weight: 600 !important;
@@ -33,118 +35,127 @@ def render_guest_scout():
             text-transform: uppercase !important;
         }
 
-        /* 1. MASTER CONTAINER (Dark Frosted Glass Overlay) */
+        /* --- 2. MAIN FROSTED GLASS CONTAINER --- */
         [data-testid="stVerticalBlockBorderWrapper"] {
             background: rgba(0, 0, 0, 0.45) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: 12px !important;
-            padding: 30px !important;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+            padding: 35px !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6) !important;
         }
 
+        /* Input Labels */
         label[data-testid="stWidgetLabel"] p {
             color: #E2E8F0 !important; 
             font-weight: 500 !important;
-            font-size: 0.9rem !important;
+            font-size: 0.95rem !important;
+            margin-bottom: 5px !important;
         }
 
-        /* 2. SOLID DARK INPUT FIELDS (Fixes Grey Cloud Override) */
+        /* --- 3. UNIVERSAL INPUT FIELDS (Text, Number, Select, MultiSelect) --- */
+        /* The Outer Wrapper */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
-        /* This controls the outer wrapper of the dropdown */
-        .stSelectbox > div > div > div {
-            background-color: #08100C !important; 
-        }
-
-        /* This controls the inner clickable area of the dropdown */
-        div[data-baseweb="select"] > div {
-            background-color: #08100C !important;
-        }
+        .stSelectbox > div > div > div,
         .stMultiSelect > div > div > div {
             background-color: #08100C !important; 
             background: #08100C !important;
-            border: 1px solid rgba(52, 211, 153, 0.2) !important;
+            border: 1px solid rgba(52, 211, 153, 0.25) !important;
             border-radius: 8px !important;
-            transition: all 0.2s ease !important;
+            transition: all 0.2s ease-in-out !important;
+            box-shadow: none !important;
         }
 
+        /* The Internal Input Area */
         .stTextInput input,
         .stNumberInput input,
-        [data-baseweb="base-input"] {
-            background-color: #08100C !important;
-            background: #08100C !important;
+        [data-baseweb="base-input"],
+        div[data-baseweb="select"] > div {
+            background-color: transparent !important;
+            background: transparent !important;
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important;
+            border: none !important;
         }
 
-        /* Target the internal selectbox inputs to match the wrapper */
-        div[data-baseweb="select"] > div {
-            background-color: #08100C !important;
-            background: #08100C !important;
-            color: #FFFFFF !important;
-            border: 1px solid rgba(52, 211, 153, 0.3) !important;
+        /* Dropdown Arrow Background Killer */
+        div[data-baseweb="select"] > div:first-child > div:last-child {
+            background-color: transparent !important;
         }
 
-        /* Fix the React Portals (Dropdown Menus) */
+        /* Hover & Focus States (Mint Green Glow) */
+        .stTextInput > div > div > div:hover,
+        .stSelectbox > div > div > div:hover,
+        .stMultiSelect > div > div > div:hover,
+        .stTextInput > div > div > div:focus-within,
+        .stSelectbox > div > div > div:focus-within,
+        .stMultiSelect > div > div > div:focus-within {
+            background-color: #0A1611 !important;
+            border-color: #34D399 !important;
+            box-shadow: 0 0 8px rgba(52, 211, 153, 0.25) !important;
+        }
+
+        /* Dropdown Popover Menus */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
             background-color: #08100C !important; 
             background: #08100C !important;
-            border: 1px solid rgba(52, 211, 153, 0.3) !important;
+            border: 1px solid #34D399 !important;
             border-radius: 8px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
         }
-
         li[role="option"] {
             background-color: transparent !important;
             color: #FFFFFF !important;
+            transition: background-color 0.1s ease !important;
         }
-
         li[role="option"]:hover,
         li[role="option"][aria-selected="true"] {
-            background-color: rgba(52, 211, 153, 0.15) !important;
+            background-color: rgba(52, 211, 153, 0.2) !important;
             color: #34D399 !important;
         }
 
-        .stTextInput > div > div > div:hover,
-        .stSelectbox > div > div > div:hover,
-        .stTextInput > div > div > div:focus-within,
-        .stSelectbox > div > div > div:focus-within,
-        .stMultiSelect > div > div > div:hover,
-        .stMultiSelect > div > div > div:focus-within {
-            background-color: #0A1611 !important;
+        /* Number Input (+ / -) Buttons */
+        [data-testid="stNumberInputStepDown"],
+        [data-testid="stNumberInputStepUp"] {
+            background: transparent !important;
+            color: #94A3B8 !important;
+            border: none !important;
+        }
+        [data-testid="stNumberInputStepDown"]:hover,
+        [data-testid="stNumberInputStepUp"]:hover {
+            color: #34D399 !important;
+        }
+
+        /* --- 4. RADIO BUTTONS & CHECKBOXES --- */
+        div[role="radiogroup"] {
+            gap: 15px !important;
+        }
+        div[role="radiogroup"] > label {
+            background-color: #08100C !important;
+            padding: 10px 25px !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(52, 211, 153, 0.3) !important;
+            transition: all 0.2s ease !important;
+            cursor: pointer !important;
+        }
+        div[role="radiogroup"] > label:hover {
             border-color: #34D399 !important;
-            box-shadow: 0 0 8px rgba(52, 211, 153, 0.2) !important;
+            background-color: rgba(52, 211, 153, 0.05) !important;
+        }
+        div[role="radiogroup"] > label[aria-checked="true"] {
+            background: rgba(52, 211, 153, 0.15) !important;
+            border-color: #34D399 !important;
         }
 
-        /* 3. FIX OVERLAPPING ICON TEXT BUGS */
-        [data-testid="stExpanderToggleIcon"] { 
-            display: none !important; 
-            font-size: 0px !important;
-            color: transparent !important;
-        }
-        [data-testid="stExpander"] summary span {
-            color: transparent !important; 
-        }
-
-        [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) {
-            color: transparent !important; 
-            font-size: 0px !important;
-            line-height: 0 !important;
-        }
-        [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) svg {
-            fill: #94A3B8 !important;
-        }
-
-        svg[data-baseweb="icon"] { fill: #FFFFFF !important; }
-
-        /* 4. PRIMARY & SECONDARY BUTTONS (This auto-fixes the Top Nav) */
+        /* --- 5. BUTTONS (Action & Navigation) --- */
         button[kind="primary"] {
             background-color: #34D399 !important; 
             color: #040D08 !important; 
             border: none !important;
-            border-radius: 4px !important;
+            border-radius: 6px !important;
             height: 48px !important;
             font-weight: 700 !important;
             font-size: 1.05rem !important;
@@ -159,78 +170,48 @@ def render_guest_scout():
         }
         
         button[kind="secondary"] {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
             color: #FFFFFF !important;
-            border-radius: 30px !important;
+            border-radius: 6px !important;
+            height: 48px !important;
             font-weight: 600 !important;
-            transition: all 0.3s ease !important;
+            transition: all 0.2s ease !important;
         }
         button[kind="secondary"]:hover {
-            background-color: rgba(52, 211, 153, 0.15) !important;
+            background-color: rgba(52, 211, 153, 0.1) !important;
             border-color: #34D399 !important;
             color: #34D399 !important;
         }
 
-        /* Number Input (+ / -) Buttons */
-        [data-testid="stNumberInputStepDown"],
-        [data-testid="stNumberInputStepUp"] {
-            background: transparent !important;
-            color: #FFFFFF !important;
-            border: none !important;
+        /* --- 6. BUG FIXES & ICON CLEANSING --- */
+        /* Hides broken text/icons in inputs */
+        [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) {
+            color: transparent !important; 
+            font-size: 0px !important;
         }
-        [data-testid="stNumberInputStepDown"]:hover,
-        [data-testid="stNumberInputStepUp"]:hover {
-            color: #34D399 !important;
+        [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) svg,
+        svg[data-baseweb="icon"] { 
+            fill: #94A3B8 !important; 
         }
-
-        /* Checkbox & Radio Alignment */
-        div[role="radiogroup"] {
-            gap: 15px !important;
-        }
-        div[role="radiogroup"] > label {
-            background-color: #08100C !important;
-            padding: 10px 20px !important;
-            border-radius: 8px !important;
-            border: 1px solid rgba(52, 211, 153, 0.3) !important;
-            transition: all 0.3s ease !important;
-            cursor: pointer !important;
-        }
-        div[role="radiogroup"] > label:hover {
-            border-color: #34D399 !important;
-        }
-        div[role="radiogroup"] > label[aria-checked="true"] {
-            background: rgba(52, 211, 153, 0.15) !important;
-            border-color: #34D399 !important;
-        }
-
-        /* --- DASHBOARD INTELLIGENCE HUB STYLING (For Step 3) --- */
+        [data-testid="stExpanderToggleIcon"] { display: none !important; }
+        
+        /* --- 7. DASHBOARD INTELLIGENCE HUB (Step 3 UI) --- */
         [data-testid="stStatusWidget"] {
             background: #08100C !important;
-            border: 1px solid rgba(52, 211, 153, 0.2) !important;
+            border: 1px solid rgba(52, 211, 153, 0.25) !important;
             border-radius: 12px !important;
             box-shadow: 0 10px 40px rgba(0,0,0,0.4) !important;
         }
         [data-testid="stStatusWidget"] details,
         [data-testid="stStatusWidget"] summary {
             background-color: transparent !important;
-            background: transparent !important;
             color: #F8FAFC !important;
         }
-        
-        [data-testid="stNotification"] {
-            background-color: rgba(220, 38, 38, 0.15) !important;
-            backdrop-filter: blur(6px) !important;
-            border: 1px solid rgba(220, 38, 38, 0.5) !important;
-            color: #F8FAFC !important;
-            border-radius: 8px !important;
-        }
-
         [data-testid="stMetricValue"] {
             color: #F8FAFC !important;
             font-weight: 800 !important;
         }
-
         span[data-baseweb="tag"] {
             background-color: rgba(52, 211, 153, 0.15) !important;
             color: #34D399 !important;
@@ -239,7 +220,9 @@ def render_guest_scout():
         </style>
     """, unsafe_allow_html=True)
 
-    # --- PAGE 1: PROFILE SCOUT ---
+    # ==========================================
+    # PAGE 1: PROFILE SCOUT
+    # ==========================================
     if st.session_state.step == 1:
         data = st.session_state.user_data
         
@@ -317,7 +300,9 @@ def render_guest_scout():
                         st.session_state.step = 2
                         st.rerun()
 
-    # --- PAGE 2: REWARDS BLUEPRINT ---
+    # ==========================================
+    # PAGE 2: REWARDS BLUEPRINT
+    # ==========================================
     elif st.session_state.step == 2:
         data = st.session_state.user_data
         _, center_column, _ = st.columns([1, 2, 1])
@@ -423,6 +408,7 @@ def render_guest_scout():
                 st.divider()
                 col_back, col_space, col_next = st.columns([3, 4, 3])
                 
+                # BOTH buttons are now Primary (Mint Green) as requested!
                 if col_back.button("Back", type="primary", use_container_width=True):
                     st.session_state.step = 1
                     st.rerun()
@@ -438,7 +424,9 @@ def render_guest_scout():
                     st.session_state.step = 3
                     st.rerun()
                     
-    # --- PAGE 3: THE PODIUM & AI DASHBOARD ---
+    # ==========================================
+    # PAGE 3: THE PODIUM & AI DASHBOARD
+    # ==========================================
     elif st.session_state.step == 3:
         from core.ai_agent import generate_card_roadmap, generate_battle_analysis
         import time
