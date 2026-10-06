@@ -57,6 +57,7 @@ def render_guest_scout():
 
         /* ----------------------------------------------------------- */
         
+        /* ----------------------------------------------------------- */
         /* --- THE PERFECT INPUT FIELD FIX (BLACK GLASS) --- */
         
         /* 1. The Outer Wrapper: Deep Black with Slight Transparency */
