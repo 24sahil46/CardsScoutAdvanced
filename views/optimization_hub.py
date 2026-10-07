@@ -135,7 +135,7 @@ def render_optimization_hub():
             border: none !important;
             border-radius: 30px !important; 
             height: 48px !important;
-            padding: 0 24px !important; /* Forces breathing room for text */
+            padding: 0 24px !important; 
             font-weight: 700 !important;
             font-size: 1.05rem !important;
             box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2) !important;
@@ -153,7 +153,7 @@ def render_optimization_hub():
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: #FFFFFF !important;
             border-radius: 30px !important;
-            padding: 0 24px !important; /* Forces breathing room for text */
+            padding: 0 24px !important; 
             font-weight: 600 !important;
         }
         button[kind="secondary"]:hover {
@@ -353,7 +353,10 @@ def render_optimization_hub():
                 c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
                 if c_btn.button("Track Waiver", type="primary", use_container_width=True, key="btn_w"):
                     with st.spinner("AI fetching real fee waiver targets..."):
-                        st.session_state[f"waiver_{selected_track_card}"] = get_fee_waiver_target(selected_track_card)
+                        try:
+                            st.session_state[f"waiver_{selected_track_card}"] = get_fee_waiver_target(selected_track_card)
+                        except Exception as e:
+                            st.warning(f"⚠️ {str(e)}")
                 
                 target_spend = st.session_state.get(f"waiver_{selected_track_card}")
                 
@@ -401,8 +404,11 @@ def render_optimization_hub():
                 c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
                 if c_btn.button("📡 Scan Web", type="primary", use_container_width=True):
                     with st.spinner(f"Scanning web for flights, trains, fuel, dining & shopping deals on '{selected_offer_card}'..."):
-                        offers_data = fetch_live_card_offers(selected_offer_card)
-                        st.session_state[f"offers_{selected_offer_card}"] = offers_data
+                        try:
+                            offers_data = fetch_live_card_offers(selected_offer_card)
+                            st.session_state[f"offers_{selected_offer_card}"] = offers_data
+                        except Exception as e:
+                            st.warning(f"⚠️ {str(e)}")
 
                 saved_offers = st.session_state.get(f"offers_{selected_offer_card}")
                 if saved_offers:
@@ -423,8 +429,11 @@ def render_optimization_hub():
                 c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
                 if c_btn.button("🔍 Scan Milestones", type="primary", use_container_width=True):
                     with st.spinner(f"Extracting milestone data for {milestone_card}..."):
-                        milestones_data = get_hidden_milestones(milestone_card)
-                        st.session_state[f"milestones_{milestone_card}"] = milestones_data
+                        try:
+                            milestones_data = get_hidden_milestones(milestone_card)
+                            st.session_state[f"milestones_{milestone_card}"] = milestones_data
+                        except Exception as e:
+                            st.warning(f"⚠️ {str(e)}")
                 
                 saved_milestones = st.session_state.get(f"milestones_{milestone_card}")
                 if saved_milestones:
@@ -494,7 +503,11 @@ def render_optimization_hub():
                     if selected_filter != "All Cards":
                         services_list = ", ".join(filtered_df["Service"].unique())
                         with st.spinner(f"AI calculating exact yield for {services_list}..."):
-                            actual_rate = get_utility_cashback_rate(selected_filter, services_list)
+                            try:
+                                actual_rate = get_utility_cashback_rate(selected_filter, services_list)
+                            except Exception as e:
+                                st.warning(f"⚠️ {str(e)}")
+                                actual_rate = 1.0 # Fallback so the math doesn't crash
                         est_annual_yield = annual_spend * (actual_rate / 100)
                         yield_label = f"({actual_rate}% Actual Value-Back)"
                     else:
@@ -551,7 +564,10 @@ def render_optimization_hub():
                     st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
                     if st.button("✈️ Analyze Forex Fees", key="btn_fx", type="primary", use_container_width=True):
                         with st.spinner("AI analyzing actual markup rates..."):
-                            st.session_state[f"forex_{travel_card}"] = get_forex_markup(travel_card)
+                            try:
+                                st.session_state[f"forex_{travel_card}"] = get_forex_markup(travel_card)
+                            except Exception as e:
+                                st.warning(f"⚠️ {str(e)}")
                     
                 ai_markup_rate = st.session_state.get(f"forex_{travel_card}", 3.5)
                 current_markup = st.slider(f"Confirmed Forex Markup for {travel_card} (%)", 0.0, 5.0, ai_markup_rate, step=0.1)
@@ -595,7 +611,10 @@ def render_optimization_hub():
                 col_pt3.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
                 if col_pt3.button("Evaluate Points", key="btn_pts", type="primary", use_container_width=True):
                     with st.spinner(f"AI scraping live valuation multipliers for {pt_card}..."):
-                        st.session_state[f"pts_{pt_card}"] = get_reward_point_values(pt_card)
+                        try:
+                            st.session_state[f"pts_{pt_card}"] = get_reward_point_values(pt_card)
+                        except Exception as e:
+                            st.warning(f"⚠️ {str(e)}")
                 
                 pt_data = st.session_state.get(f"pts_{pt_card}")
                 
@@ -650,7 +669,10 @@ def render_optimization_hub():
                 c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
                 if c_btn.button("Run Audit", key="btn_audit", type="primary", use_container_width=True):
                     with st.spinner(f"AI conducting forensic audit of {audit_card} terms and conditions..."):
-                        st.session_state[f"audit_{audit_card}"] = get_fee_and_penalty_audit(audit_card)
+                        try:
+                            st.session_state[f"audit_{audit_card}"] = get_fee_and_penalty_audit(audit_card)
+                        except Exception as e:
+                            st.warning(f"⚠️ {str(e)}")
                 
                 audit_data = st.session_state.get(f"audit_{audit_card}")
                 
