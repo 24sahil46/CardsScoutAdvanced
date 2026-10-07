@@ -26,6 +26,11 @@ def load_environment():
         os.getenv("GEMINI_API_KEY_3", ""),
         os.getenv("GEMINI_API_KEY_4", ""),
         os.getenv("GEMINI_API_KEY_5", ""),
+        os.getenv("GEMINI_API_KEY_6", ""), # <-- ADDED YOUR 6TH KEY!
+        os.getenv("GEMINI_API_KEY_7", ""), # Added extra slots for future-proofing
+        os.getenv("GEMINI_API_KEY_8", ""),
+        os.getenv("GEMINI_API_KEY_9", ""),
+        os.getenv("GEMINI_API_KEY_10", ""),
         os.getenv("GEMINI_API_KEY", "") 
     ]
     
