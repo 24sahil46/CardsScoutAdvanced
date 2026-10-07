@@ -676,16 +676,24 @@ def render_optimization_hub():
     # IF NOT LOGGED IN: Show Login/Signup form
     # ==========================================
     else:
-        # 1. MAKE THE 'VISIBILITY' TEXT COMPLETELY TRANSPARENT
+        # 1. ULTIMATE CSS TO DESTROY THE PASSWORD EYE ICON / TEXT
         st.markdown("""
             <style>
-            /* Forces the text color to be fully transparent and disables clicking on it */
-            [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child,
-            [data-testid="stTextInput"] div[data-baseweb="input"] button {
-                color: transparent !important;
-                background-color: transparent !important;
+            /* Directly targets the specific button Streamlit uses for the eye icon */
+            [data-testid="stTextInput"] button,
+            [data-testid="stTextInput"] [role="button"] {
+                display: none !important;
+                visibility: hidden !important;
                 opacity: 0 !important;
+                width: 0px !important;
+                height: 0px !important;
+                font-size: 0px !important;
                 pointer-events: none !important;
+            }
+            
+            /* Hides the right-side container just in case */
+            [data-testid="stTextInput"] div[data-baseweb="input"] > div:nth-child(2) {
+                display: none !important;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -710,7 +718,7 @@ def render_optimization_hub():
                 clean_title = auth_mode.replace('🟢', '').replace('✨', '').strip()
                 title_placeholder.markdown(f"<h3 style='text-align: center; color: #E2E8F0; margin-bottom: 25px;'>{clean_title}</h3>", unsafe_allow_html=True)
                 
-                username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., sahil_wealth", key="login_username")
+                username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., abc_24", key="login_username")
                 
                 st.markdown("🔑 **Security Clearance (Password)**")
                 
