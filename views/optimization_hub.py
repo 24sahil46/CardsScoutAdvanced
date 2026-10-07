@@ -41,7 +41,7 @@ def render_optimization_hub():
         }
         .vault-subtitle {
             font-family: 'Inter', -apple-system, sans-serif !important;
-            color: #D4AF37 !important; /* Perfect Gold Match */
+            color: #D4AF37 !important; 
             font-size: 0.95rem !important;
             letter-spacing: 3px !important;
             font-weight: 600 !important;
@@ -61,7 +61,7 @@ def render_optimization_hub():
             box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
         }
 
-        /* 2. SOLID DARK INPUT FIELDS (Fixes Grey Cloud Override) */
+        /* 2. SOLID DARK INPUT FIELDS */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
         .stSelectbox > div > div > div,
@@ -82,7 +82,6 @@ def render_optimization_hub():
             -webkit-text-fill-color: #FFFFFF !important;
         }
 
-        /* Fix the React Portals (Dropdown Menus) */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
             background-color: #08100C !important; 
@@ -111,8 +110,7 @@ def render_optimization_hub():
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.2) !important;
         }
 
-        /* 3. FIX OVERLAPPING ICON TEXT BUGS (Expander & Password Eye) */
-        /* Nuke the broken expander arrow */
+        /* 3. FIX OVERLAPPING ICON TEXT BUGS */
         [data-testid="stExpanderToggleIcon"] { 
             display: none !important; 
             font-size: 0px !important;
@@ -121,26 +119,23 @@ def render_optimization_hub():
         [data-testid="stExpander"] summary span {
             color: transparent !important; 
         }
-
-        /* THE ULTIMATE PASSWORD "VISIBILITY" TEXT KILLER */
-        /* Targets everything in the input wrapper that is NOT the typing area */
         [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) {
             color: transparent !important; 
             font-size: 0px !important;
             line-height: 0 !important;
         }
-        /* Keep the eye icon visible if the SVG actually manages to load */
         [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) svg {
             fill: #94A3B8 !important;
         }
 
-        /* 4. PRIMARY & SECONDARY BUTTONS */
+        /* 4. PRIMARY & SECONDARY BUTTONS (FIXED PADDING AND SHAPE) */
         button[kind="primary"] {
             background-color: #34D399 !important; 
             color: #040D08 !important; 
             border: none !important;
-            border-radius: 4px !important;
+            border-radius: 30px !important; 
             height: 48px !important;
+            padding: 0 24px !important; /* Forces breathing room for text */
             font-weight: 700 !important;
             font-size: 1.05rem !important;
             box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2) !important;
@@ -158,6 +153,7 @@ def render_optimization_hub():
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             color: #FFFFFF !important;
             border-radius: 30px !important;
+            padding: 0 24px !important; /* Forces breathing room for text */
             font-weight: 600 !important;
         }
         button[kind="secondary"]:hover {
@@ -239,7 +235,7 @@ def render_optimization_hub():
             font-weight: 700 !important;
         }
         
-        /* 8. SUCCESS ALERTS (Welcome Message Theme Match) */
+        /* 8. SUCCESS ALERTS */
         [data-testid="stAlert"] {
             background-color: rgba(52, 211, 153, 0.1) !important;
             border: 1px solid rgba(52, 211, 153, 0.3) !important;
@@ -250,15 +246,8 @@ def render_optimization_hub():
             color: #F8FAFC !important;
             font-weight: 600 !important;
         }
-        /* Completely hide Streamlit's native password eye icon / visibility text element */
-        [data-baseweb="input"] > div:last-child:has(svg),
-        [data-baseweb="input"] > div:last-child:has(button) {
-            display: none !important;
-        }
-        [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child {
-            display: none !important;
-        }
-        /* Universal bullet mask when show password is unchecked */
+        
+        /* Password Masking Fallback */
         div[data-testid="stCheckbox"] input[aria-checked="false"] ~ * /* fallback styling */
         input[aria-label="Password"] {
             -webkit-text-security: disc;
@@ -361,13 +350,11 @@ def render_optimization_hub():
                 c_sel, c_btn = st.columns([3, 1])
                 selected_track_card = c_sel.selectbox("Select card to track:", st.session_state.wallet, key="waiver_card")
                 
-                # FIXED: STOPPED BACKGROUND API BURST WITH AN ACTION BUTTON
                 c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
                 if c_btn.button("Track Waiver", type="primary", use_container_width=True, key="btn_w"):
                     with st.spinner("AI fetching real fee waiver targets..."):
                         st.session_state[f"waiver_{selected_track_card}"] = get_fee_waiver_target(selected_track_card)
                 
-                # Only render logic if data exists in session state for this card
                 target_spend = st.session_state.get(f"waiver_{selected_track_card}")
                 
                 if target_spend is not None:
@@ -434,7 +421,7 @@ def render_optimization_hub():
                 milestone_card = c_sel.selectbox("Select card to analyze:", st.session_state.wallet, key="milestone_card")
                 
                 c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
-                if c_btn.button("🔍 Scan for Hidden Rewards", type="primary", use_container_width=True):
+                if c_btn.button("🔍 Scan Milestones", type="primary", use_container_width=True):
                     with st.spinner(f"Extracting milestone data for {milestone_card}..."):
                         milestones_data = get_hidden_milestones(milestone_card)
                         st.session_state[f"milestones_{milestone_card}"] = milestones_data
@@ -561,13 +548,13 @@ def render_optimization_hub():
                 with col_fx2:
                     travel_card = st.selectbox("Card to use abroad:", st.session_state.wallet, key="forex_card")
                     
-                    # FIXED: STOPPED BACKGROUND API BURST WITH AN ACTION BUTTON
-                    if st.button("Analyze Forex Fees", key="btn_fx", type="primary"):
+                    st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+                    if st.button("✈️ Analyze Forex Fees", key="btn_fx", type="primary", use_container_width=True):
                         with st.spinner("AI analyzing actual markup rates..."):
                             st.session_state[f"forex_{travel_card}"] = get_forex_markup(travel_card)
                     
-                    ai_markup_rate = st.session_state.get(f"forex_{travel_card}", 3.5)
-                    current_markup = st.slider(f"Confirmed Forex Markup for {travel_card} (%)", 0.0, 5.0, ai_markup_rate, step=0.1)
+                ai_markup_rate = st.session_state.get(f"forex_{travel_card}", 3.5)
+                current_markup = st.slider(f"Confirmed Forex Markup for {travel_card} (%)", 0.0, 5.0, ai_markup_rate, step=0.1)
                     
                 conversion_rate = 83 if "USD" in currency else 90 if "EUR" in currency else 105 if "GBP" in currency else 22
                 inr_budget = budget * conversion_rate
@@ -601,12 +588,12 @@ def render_optimization_hub():
             if not st.session_state.wallet:
                 st.warning("⚠️ Please add a card to your Digital Wallet above.")
             else:
-                col_pt1, col_pt2 = st.columns([2, 1])
+                col_pt1, col_pt2, col_pt3 = st.columns([2, 1.5, 1.5])
                 pt_card = col_pt1.selectbox("Select Card to Evaluate:", st.session_state.wallet, key="pt_card")
-                pt_balance = col_pt2.number_input("Your Current Point Balance", min_value=0, value=10000, step=1000)
+                pt_balance = col_pt2.number_input("Current Point Balance", min_value=0, value=10000, step=1000)
                 
-                # FIXED: STOPPED BACKGROUND API BURST WITH AN ACTION BUTTON
-                if st.button("Evaluate Point Valuation", key="btn_pts", type="primary"):
+                col_pt3.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+                if col_pt3.button("Evaluate Points", key="btn_pts", type="primary", use_container_width=True):
                     with st.spinner(f"AI scraping live valuation multipliers for {pt_card}..."):
                         st.session_state[f"pts_{pt_card}"] = get_reward_point_values(pt_card)
                 
@@ -657,10 +644,11 @@ def render_optimization_hub():
             if not st.session_state.wallet:
                 st.warning("⚠️ Please add a card to your Digital Wallet above.")
             else:
-                audit_card = st.selectbox("Select Card to Audit:", st.session_state.wallet, key="audit_card")
+                c_sel, c_btn = st.columns([3, 1])
+                audit_card = c_sel.selectbox("Select Card to Audit:", st.session_state.wallet, key="audit_card")
                 
-                # FIXED: STOPPED BACKGROUND API BURST WITH AN ACTION BUTTON
-                if st.button("Run Forensic Audit", key="btn_audit", type="primary"):
+                c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+                if c_btn.button("Run Audit", key="btn_audit", type="primary", use_container_width=True):
                     with st.spinner(f"AI conducting forensic audit of {audit_card} terms and conditions..."):
                         st.session_state[f"audit_{audit_card}"] = get_fee_and_penalty_audit(audit_card)
                 
@@ -694,10 +682,8 @@ def render_optimization_hub():
     # IF NOT LOGGED IN: Show Login/Signup form
     # ==========================================
     else:
-        # 1. ULTIMATE CSS TO DESTROY THE PASSWORD EYE ICON / TEXT
         st.markdown("""
             <style>
-            /* Directly targets the specific button Streamlit uses for the eye icon */
             [data-testid="stTextInput"] button,
             [data-testid="stTextInput"] [role="button"] {
                 display: none !important;
@@ -708,8 +694,6 @@ def render_optimization_hub():
                 font-size: 0px !important;
                 pointer-events: none !important;
             }
-            
-            /* Hides the right-side container just in case */
             [data-testid="stTextInput"] div[data-baseweb="input"] > div:nth-child(2) {
                 display: none !important;
             }
@@ -740,10 +724,8 @@ def render_optimization_hub():
                 
                 st.markdown("🔑 **Security Clearance (Password)**")
                 
-                # Fetch checkbox state FIRST so the input knows whether to mask or show text
                 show_pwd = st.session_state.get("show_pwd_checkbox", False)
                 
-                # Draw the password field ABOVE the checkbox
                 password = st.text_input(
                     "Password", 
                     type="default" if show_pwd else "password", 
@@ -752,7 +734,6 @@ def render_optimization_hub():
                     key="login_password_box"
                 )
                 
-                # Draw the checkbox BELOW the password field
                 st.checkbox("Show password", key="show_pwd_checkbox")
                 
                 st.markdown("<br>", unsafe_allow_html=True)
