@@ -5,7 +5,7 @@ import os
 from config.settings import APP_SETTINGS
 
 # 1. Page Configuration
-st.set_page_config(page_title="CardScout AI", page_icon="💎", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="CardScout AI", page_icon="🕵️‍♂️", layout="wide", initial_sidebar_state="collapsed")
 st.markdown("""
     <style>
     /* 1. Hide the empty default Streamlit header */
@@ -155,7 +155,7 @@ with nav_brand:
     st.markdown("""
         <div style='display: flex; align-items: center; height: 100%; margin-top: -12px; cursor: default;'>
             <h2 style='margin: 0; font-weight: 700; font-size: 1.7rem; letter-spacing: -0.5px; font-family: "Inter", sans-serif;'>
-                <span style='color: #FFFFFF;'>Card</span><span style='color: #34D399;'>Scout</span>
+                <span style='color: #FFFFFF;'>🕵️Card</span><span style='color: #34D399;'>Scout</span>
             </h2>
         </div>
     """, unsafe_allow_html=True)
