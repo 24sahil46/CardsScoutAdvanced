@@ -266,7 +266,7 @@ def render_optimization_hub():
         st.markdown("""
             <div style="text-align: center; margin-bottom: 30px; margin-top: 10px;">
                 <h1 class='vault-title'>
-                    <span>💎 The Obsidian </span><span style="color: #34D399;">Vault</span>
+                    <span> Obsidian </span><span style="color: #34D399;">Vault</span>
                 </h1>
                 <p class='vault-subtitle'>Active Yield & Subscription Command</p>
             </div>
