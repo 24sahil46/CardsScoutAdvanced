@@ -676,15 +676,16 @@ def render_optimization_hub():
     # IF NOT LOGGED IN: Show Login/Signup form
     # ==========================================
     else:
-        # 1. ULTIMATE CSS TO NUKE THE 'VISIBILITY' TEXT FOREVER
+        # 1. MAKE THE 'VISIBILITY' TEXT COMPLETELY TRANSPARENT
         st.markdown("""
             <style>
-            /* Targets ANYTHING in the input wrapper that is NOT the typing area and hides it */
-            [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) {
-                display: none !important;
+            /* Forces the text color to be fully transparent and disables clicking on it */
+            [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child,
+            [data-testid="stTextInput"] div[data-baseweb="input"] button {
                 color: transparent !important;
-                font-size: 0px !important;
-                width: 0px !important;
+                background-color: transparent !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -709,7 +710,7 @@ def render_optimization_hub():
                 clean_title = auth_mode.replace('🟢', '').replace('✨', '').strip()
                 title_placeholder.markdown(f"<h3 style='text-align: center; color: #E2E8F0; margin-bottom: 25px;'>{clean_title}</h3>", unsafe_allow_html=True)
                 
-                username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., abc_24", key="login_username")
+                username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., sahil_wealth", key="login_username")
                 
                 st.markdown("🔑 **Security Clearance (Password)**")
                 
