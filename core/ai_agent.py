@@ -218,8 +218,7 @@ def get_copilot_verdict(query, wallet_context):
 
     raise RuntimeError("All API keys are currently rate-limited.")
 
-# 15-MINUTE CACHE (900 seconds) - KEEPS DEALS LIVE
-@st.cache_data(ttl=900, show_spinner=False)
+@st.cache_data(ttl=899, show_spinner=False) # Changed from 900 to 899
 def fetch_live_card_offers(card_name):
     """Searches the web for live discounts and renders them as UI Coupon Cards."""
     attempts = 0
