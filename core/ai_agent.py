@@ -33,8 +33,8 @@ def rotate_key():
         return True
     return False
 
-# ADDED CACHING TO STOP QUOTA DRAIN ON RERUNS
-@st.cache_data(ttl=86400, show_spinner=False)
+# 1-HOUR CACHE (3600 seconds)
+@st.cache_data(ttl=3600, show_spinner=False)
 def generate_card_roadmap(user_data):
     """Searches web context and generates recommendations."""
     attempts = 0
@@ -67,14 +67,14 @@ def generate_card_roadmap(user_data):
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
-                    time.sleep(2)
+                    time.sleep(1)
                     continue
-            return f"Error generating roadmap: {error_message}"
+            raise RuntimeError(f"Roadmap Error: {error_message}")
 
-    return "All configured Gemini API keys have exceeded their current quota. Please try again shortly."
+    raise RuntimeError("All configured Gemini API keys have exceeded their current quota.")
 
-# ADDED CACHING TO STOP QUOTA DRAIN ON RERUNS
-@st.cache_data(ttl=86400, show_spinner=False)
+# 1-HOUR CACHE (3600 seconds)
+@st.cache_data(ttl=3600, show_spinner=False)
 def generate_battle_analysis(entered_card, original_recommendation, user_data):
     """Compares an entered card against the top recommendation."""
     attempts = 0
@@ -93,39 +93,56 @@ def generate_battle_analysis(entered_card, original_recommendation, user_data):
             model = get_gemini_model()
             response = model.generate_content(battle_prompt)
             return response.text
+            
         except Exception as e:
             error_message = str(e)
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
-                    time.sleep(2)
+                    time.sleep(1)
                     continue
-            return f"Error during battle analysis: {error_message}"
+            raise RuntimeError(f"Battle Analysis Error: {error_message}")
 
-    return "All API keys exhausted for battle analysis."
+    raise RuntimeError("All API keys exhausted for battle analysis.")
 
-@st.cache_data(ttl=86400, show_spinner=False)
+# 1-HOUR CACHE (3600 seconds)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_fee_waiver_target(card_name):
     """Fetches annual fee waiver spend target with fallback."""
-    try:
-        query = f"What is the annual fee waiver spend target for {card_name} credit card in India 2026?"
-        web_data = tavily.search(query=query)
-        
-        prompt = f"""
-        Based on this web data: {web_data}.
-        What is the exact annual spend required in INR to waive the annual fee for the '{card_name}'? 
-        Return ONLY the integer number (e.g., 100000, 200000). 
-        If it is lifetime free or has no waiver, return 0. Do not include text or commas.
-        """
-        model = get_gemini_model()
-        response = model.generate_content(prompt)
-        numbers = re.findall(r'\d+', response.text.replace(',', ''))
-        return int(numbers[0]) if numbers else 200000 
-    except Exception:
-        return 200000
+    attempts = 0
+    max_attempts = len(KEY_POOL)
 
-@st.cache_data(ttl=86400, show_spinner=False)
+    while attempts < max_attempts:
+        try:
+            query = f"What is the annual fee waiver spend target for {card_name} credit card in India 2026?"
+            web_data = tavily.search(query=query)
+            
+            prompt = f"""
+            Based on this web data: {web_data}.
+            What is the exact annual spend required in INR to waive the annual fee for the '{card_name}'? 
+            Return ONLY the integer number (e.g., 100000, 200000). 
+            If it is lifetime free or has no waiver, return 0. Do not include text or commas.
+            """
+            model = get_gemini_model()
+            response = model.generate_content(prompt)
+            numbers = re.findall(r'\d+', response.text.replace(',', ''))
+            return int(numbers[0]) if numbers else 200000 
+            
+        except Exception as e:
+            error_message = str(e)
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
+                attempts += 1
+                if rotate_key() and attempts < max_attempts:
+                    import time
+                    time.sleep(1)
+                    continue
+            raise RuntimeError(f"Waiver Target Error: {error_message}")
+
+    raise RuntimeError("All API keys exhausted.")
+
+# 1-HOUR CACHE (3600 seconds)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_forex_markup(card_name):
     """Fetches the actual forex markup fee percentage with key rotation."""
     attempts = 0
@@ -157,14 +174,14 @@ def get_forex_markup(card_name):
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
-                    time.sleep(2)
+                    time.sleep(1)
                     continue
-            return 3.5 
+            raise RuntimeError(f"Forex fetch error: {error_message}")
 
-    return 3.5 
+    raise RuntimeError("All API keys exhausted.")
 
-# ADDED CACHING TO STOP QUOTA DRAIN ON RERUNS
-@st.cache_data(ttl=86400, show_spinner=False)
+# 15-MINUTE CACHE (900 seconds) - KEEPS DEALS LIVE
+@st.cache_data(ttl=900, show_spinner=False)
 def get_copilot_verdict(query, wallet_context):
     """Evaluates an impromptu expense against the user's wallet."""
     attempts = 0
@@ -190,16 +207,19 @@ def get_copilot_verdict(query, wallet_context):
             return response.text
         
         except Exception as e:
-            attempts += 1
-            if rotate_key() and attempts < max_attempts:
-                import time
-                time.sleep(2)
-                continue
-            return "🔴 SYSTEM ERROR: Unable to analyze expense at this time."
+            error_message = str(e)
+            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
+                attempts += 1
+                if rotate_key() and attempts < max_attempts:
+                    import time
+                    time.sleep(1)
+                    continue
+            raise RuntimeError(f"Copilot Error: {error_message}")
 
-    return "🔴 SYSTEM ERROR: All AI instances are currently rate-limited."
+    raise RuntimeError("All API keys are currently rate-limited.")
 
-@st.cache_data(ttl=86400, show_spinner=False)
+# 15-MINUTE CACHE (900 seconds) - KEEPS DEALS LIVE
+@st.cache_data(ttl=900, show_spinner=False)
 def fetch_live_card_offers(card_name):
     """Searches the web for live discounts and renders them as UI Coupon Cards."""
     attempts = 0
@@ -242,13 +262,14 @@ def fetch_live_card_offers(card_name):
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
-                    time.sleep(2)
+                    time.sleep(1)
                     continue
-            return f"<div style='color: #ef4444; padding: 15px; border: 1px solid #ef4444; border-radius: 8px;'>Error fetching offers: {error_message}</div>"
+            raise RuntimeError(f"Error fetching offers: {error_message}")
 
-    return "<div style='color: #ef4444; padding: 15px; border: 1px solid #ef4444; border-radius: 8px;'>All API keys exhausted. Please try again later.</div>"
+    raise RuntimeError("All API keys exhausted. Please try again later.")
 
-@st.cache_data(ttl=86400, show_spinner=False)
+# 1-HOUR CACHE (3600 seconds)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_hidden_milestones(card_name):
     """Fetches milestone rewards and renders them as Gold Achievement Cards."""
     attempts = 0
@@ -286,13 +307,14 @@ def get_hidden_milestones(card_name):
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
-                    time.sleep(2)
+                    time.sleep(1)
                     continue
-            return f"<div style='color: #ef4444; padding: 15px; border: 1px solid #ef4444; border-radius: 8px;'>Error fetching milestones: {error_message}</div>"
+            raise RuntimeError(f"Error fetching milestones: {error_message}")
 
-    return "<div style='color: #ef4444; padding: 15px; border: 1px solid #ef4444; border-radius: 8px;'>Milestone data temporarily unavailable.</div>"
+    raise RuntimeError("Milestone data temporarily unavailable.")
 
-@st.cache_data(ttl=86400, show_spinner=False)
+# 1-HOUR CACHE (3600 seconds)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_utility_cashback_rate(card_name, services):
     """Fetches the actual cashback percentage for specific services with key rotation."""
     attempts = 0
@@ -326,25 +348,18 @@ def get_utility_cashback_rate(card_name, services):
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
-                    time.sleep(2)
+                    time.sleep(1)
                     continue
-            return 1.0
+            raise RuntimeError(f"Utility Rate Error: {error_message}")
 
-    return 1.0
+    raise RuntimeError("Failed to calculate utility yield.")
 
-
-@st.cache_data(ttl=86400, show_spinner=False)
+# 1-HOUR CACHE (3600 seconds)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_reward_point_values(card_name):
     """Fetches exact INR conversion values for reward points across 3 redemption categories."""
     attempts = 0
     max_attempts = len(KEY_POOL)
-    
-    fallback = {
-        "cash_rate": 0.20, 
-        "voucher_rate": 0.25, 
-        "travel_rate": 0.50, 
-        "best_partner": "Airline/Hotel Partners"
-    }
 
     while attempts < max_attempts:
         try:
@@ -367,8 +382,7 @@ def get_reward_point_values(card_name):
             response = model.generate_content(prompt)
             
             cleaned_text = response.text.replace("```json", "").replace("```", "").strip()
-            data = json.loads(cleaned_text)
-            return data
+            return json.loads(cleaned_text)
             
         except Exception as e:
             error_message = str(e)
@@ -376,27 +390,18 @@ def get_reward_point_values(card_name):
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
-                    time.sleep(2)
+                    time.sleep(1)
                     continue
-            return fallback
+            raise RuntimeError(f"Point Valuation Error: {error_message}")
 
-    return fallback
+    raise RuntimeError("Failed to evaluate reward point values.")
 
-
-@st.cache_data(ttl=86400, show_spinner=False)
+# 1-HOUR CACHE (3600 seconds)
+@st.cache_data(ttl=3600, show_spinner=False)
 def get_fee_and_penalty_audit(card_name):
     """Extracts hidden fees, APR, and penalties into a structured audit format."""
     attempts = 0
     max_attempts = len(KEY_POOL)
-    
-    fallback = {
-        "annual_fee": "Bank Standard",
-        "apr": "3.5% / mo (42% Annual)",
-        "late_fee": "Up to ₹1,300",
-        "cash_advance": "2.5% (Min ₹500) + Instant Interest",
-        "overlimit": "2.5% (Min ₹500)",
-        "critical_warning": "Carrying a balance triggers high interest instantly losing the interest-free period."
-    }
 
     while attempts < max_attempts:
         try:
@@ -421,8 +426,7 @@ def get_fee_and_penalty_audit(card_name):
             response = model.generate_content(prompt)
             
             cleaned_text = response.text.replace("```json", "").replace("```", "").strip()
-            data = json.loads(cleaned_text)
-            return data
+            return json.loads(cleaned_text)
             
         except Exception as e:
             error_message = str(e)
@@ -430,8 +434,8 @@ def get_fee_and_penalty_audit(card_name):
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
-                    time.sleep(2)
+                    time.sleep(1)
                     continue
-            return fallback
+            raise RuntimeError(f"Audit Error: {error_message}")
 
-    return fallback
+    raise RuntimeError("Failed to conduct penalty audit.")
