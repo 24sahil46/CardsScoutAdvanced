@@ -258,11 +258,8 @@ def render_optimization_hub():
         [data-testid="stTextInput"] div[data-baseweb="input"] > div:last-child {
             display: none !important;
         }
-        /* If the "Show password" checkbox is NOT checked, mask the text like dots */
-        /* Note: This targets the input when checkbox state is false */
-        div[data-testid="stCheckbox"] input[aria-checked="false"] ~ * /* fallback styling */
-        
         /* Universal bullet mask when show password is unchecked */
+        div[data-testid="stCheckbox"] input[aria-checked="false"] ~ * /* fallback styling */
         input[aria-label="Password"] {
             -webkit-text-security: disc;
         }
@@ -361,39 +358,47 @@ def render_optimization_hub():
             if not st.session_state.wallet:
                 st.warning("⚠️ Please add a card to your Digital Wallet above.")
             else:
-                selected_track_card = st.selectbox("Select card to track:", st.session_state.wallet, key="waiver_card")
+                c_sel, c_btn = st.columns([3, 1])
+                selected_track_card = c_sel.selectbox("Select card to track:", st.session_state.wallet, key="waiver_card")
                 
-                with st.spinner("AI fetching real fee waiver targets..."):
-                    target_spend = get_fee_waiver_target(selected_track_card)
+                # FIXED: STOPPED BACKGROUND API BURST WITH AN ACTION BUTTON
+                c_btn.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+                if c_btn.button("Track Waiver", type="primary", use_container_width=True, key="btn_w"):
+                    with st.spinner("AI fetching real fee waiver targets..."):
+                        st.session_state[f"waiver_{selected_track_card}"] = get_fee_waiver_target(selected_track_card)
                 
-                if target_spend == 0:
-                    st.info("ℹ️ **No Spend Target Required**")
-                    st.write("The AI detects this card either does not offer a spend-based waiver (e.g., it charges a strict fixed fee but gives renewal bonus points) or it is Lifetime Free. You do not need to force unnecessary spending on this card just to chase a waiver!")
-                else:
-                    col1, col2 = st.columns(2)
-                    ytd_spend = col1.number_input("Your Actual Current Spend (₹)", min_value=0, max_value=target_spend*2, value=0, step=5000)
-                    months_left = col2.slider("Months until card renewal", 1, 12, 6)
-                    
-                    amount_left = max(0, target_spend - ytd_spend)
-                    
-                    st.metric("Target Spend for Waiver", f"₹{target_spend:,}", delta=f"₹{amount_left:,} remaining", delta_color="inverse")
-                    
-                    if amount_left == 0:
-                        st.success("🎉 You have already hit the waiver target! Don't stress about spending on this card.")
+                # Only render logic if data exists in session state for this card
+                target_spend = st.session_state.get(f"waiver_{selected_track_card}")
+                
+                if target_spend is not None:
+                    if target_spend == 0:
+                        st.info("ℹ️ **No Spend Target Required**")
+                        st.write("The AI detects this card either does not offer a spend-based waiver (e.g., it charges a strict fixed fee but gives renewal bonus points) or it is Lifetime Free. You do not need to force unnecessary spending on this card just to chase a waiver!")
                     else:
-                        req_monthly = amount_left / months_left
-                        st.markdown("---")
-                        st.markdown(f"**The Pacing Math:** You need to spend **₹{req_monthly:,.0f} / month** for the next {months_left} months to waive your fee.")
+                        col1, col2 = st.columns(2)
+                        ytd_spend = col1.number_input("Your Actual Current Spend (₹)", min_value=0, max_value=target_spend*2, value=0, step=5000)
+                        months_left = col2.slider("Months until card renewal", 1, 12, 6)
                         
-                        card_limit = st.session_state.card_limits.get(selected_track_card, 50000)
-                        utilization = req_monthly / card_limit if card_limit > 0 else 1.0
+                        amount_left = max(0, target_spend - ytd_spend)
                         
-                        if utilization > 0.30:
-                            st.error(f"🔴 **VERDICT: HOLD.** This requires a **{utilization*100:.1f}% monthly utilization** of your ₹{card_limit:,} limit. Exceeding the 30% Golden Rule will damage your CIBIL score. Pay the fee or split spends across other cards.")
-                        elif req_monthly > 25000:
-                            st.warning(f"🟡 **VERDICT: CAUTION.** Your utilization is safe ({utilization*100:.1f}%), but ₹{req_monthly:,.0f}/month is a high cash flow requirement. Do not force unnecessary spending just to save a small fee.")
+                        st.metric("Target Spend for Waiver", f"₹{target_spend:,}", delta=f"₹{amount_left:,} remaining", delta_color="inverse")
+                        
+                        if amount_left == 0:
+                            st.success("🎉 You have already hit the waiver target! Don't stress about spending on this card.")
                         else:
-                            st.success(f"🟢 **VERDICT: SWIPE.** Safe **{utilization*100:.1f}% utilization**. Route your regular groceries and utilities to this card to easily clear the waiver.")
+                            req_monthly = amount_left / months_left
+                            st.markdown("---")
+                            st.markdown(f"**The Pacing Math:** You need to spend **₹{req_monthly:,.0f} / month** for the next {months_left} months to waive your fee.")
+                            
+                            card_limit = st.session_state.card_limits.get(selected_track_card, 50000)
+                            utilization = req_monthly / card_limit if card_limit > 0 else 1.0
+                            
+                            if utilization > 0.30:
+                                st.error(f"🔴 **VERDICT: HOLD.** This requires a **{utilization*100:.1f}% monthly utilization** of your ₹{card_limit:,} limit. Exceeding the 30% Golden Rule will damage your CIBIL score. Pay the fee or split spends across other cards.")
+                            elif req_monthly > 25000:
+                                st.warning(f"🟡 **VERDICT: CAUTION.** Your utilization is safe ({utilization*100:.1f}%), but ₹{req_monthly:,.0f}/month is a high cash flow requirement. Do not force unnecessary spending just to save a small fee.")
+                            else:
+                                st.success(f"🟢 **VERDICT: SWIPE.** Safe **{utilization*100:.1f}% utilization**. Route your regular groceries and utilities to this card to easily clear the waiver.")
 
         # --- TAB 2: LIVE OFFERS RADAR ---
         with tab_offers:
@@ -556,9 +561,12 @@ def render_optimization_hub():
                 with col_fx2:
                     travel_card = st.selectbox("Card to use abroad:", st.session_state.wallet, key="forex_card")
                     
-                    with st.spinner("AI analyzing actual markup rates..."):
-                        ai_markup_rate = get_forex_markup(travel_card)
+                    # FIXED: STOPPED BACKGROUND API BURST WITH AN ACTION BUTTON
+                    if st.button("Analyze Forex Fees", key="btn_fx", type="primary"):
+                        with st.spinner("AI analyzing actual markup rates..."):
+                            st.session_state[f"forex_{travel_card}"] = get_forex_markup(travel_card)
                     
+                    ai_markup_rate = st.session_state.get(f"forex_{travel_card}", 3.5)
                     current_markup = st.slider(f"Confirmed Forex Markup for {travel_card} (%)", 0.0, 5.0, ai_markup_rate, step=0.1)
                     
                 conversion_rate = 83 if "USD" in currency else 90 if "EUR" in currency else 105 if "GBP" in currency else 22
@@ -597,44 +605,49 @@ def render_optimization_hub():
                 pt_card = col_pt1.selectbox("Select Card to Evaluate:", st.session_state.wallet, key="pt_card")
                 pt_balance = col_pt2.number_input("Your Current Point Balance", min_value=0, value=10000, step=1000)
                 
-                with st.spinner(f"AI scraping live valuation multipliers for {pt_card}..."):
-                    pt_data = get_reward_point_values(pt_card)
+                # FIXED: STOPPED BACKGROUND API BURST WITH AN ACTION BUTTON
+                if st.button("Evaluate Point Valuation", key="btn_pts", type="primary"):
+                    with st.spinner(f"AI scraping live valuation multipliers for {pt_card}..."):
+                        st.session_state[f"pts_{pt_card}"] = get_reward_point_values(pt_card)
                 
-                cash_val = pt_balance * pt_data.get("cash_rate", 0)
-                voucher_val = pt_balance * pt_data.get("voucher_rate", 0)
-                travel_val = pt_balance * pt_data.get("travel_rate", 0)
+                pt_data = st.session_state.get(f"pts_{pt_card}")
                 
-                max_val = max(cash_val, voucher_val, travel_val)
-                min_val = min(cash_val, voucher_val, travel_val)
-                arbitrage = max_val - min_val
+                if pt_data:
+                    cash_val = pt_balance * pt_data.get("cash_rate", 0)
+                    voucher_val = pt_balance * pt_data.get("voucher_rate", 0)
+                    travel_val = pt_balance * pt_data.get("travel_rate", 0)
+                    
+                    max_val = max(cash_val, voucher_val, travel_val)
+                    min_val = min(cash_val, voucher_val, travel_val)
+                    arbitrage = max_val - min_val
 
-                st.markdown("---")
-                st.markdown(f"""
-                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                    <div style="flex: 1; background: #08100C; border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 8px; padding: 15px; text-align: center;">
-                        <p style="color: #94A3B8; margin: 0; font-size: 13px; text-transform: uppercase;">Statement Credit</p>
-                        <h3 style="color: #E2E8F0; margin: 5px 0 0 0; font-size: 1.5rem;">₹{cash_val:,.0f}</h3>
-                        <p style="color: #64748B; margin: 0; font-size: 12px;">₹{pt_data.get('cash_rate', 0):.2f} / pt</p>
+                    st.markdown("---")
+                    st.markdown(f"""
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                        <div style="flex: 1; background: #08100C; border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 8px; padding: 15px; text-align: center;">
+                            <p style="color: #94A3B8; margin: 0; font-size: 13px; text-transform: uppercase;">Statement Credit</p>
+                            <h3 style="color: #E2E8F0; margin: 5px 0 0 0; font-size: 1.5rem;">₹{cash_val:,.0f}</h3>
+                            <p style="color: #64748B; margin: 0; font-size: 12px;">₹{pt_data.get('cash_rate', 0):.2f} / pt</p>
+                        </div>
+                        <div style="flex: 1; background: #08100C; border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 8px; padding: 15px; text-align: center;">
+                            <p style="color: #94A3B8; margin: 0; font-size: 13px; text-transform: uppercase;">Brand Vouchers</p>
+                            <h3 style="color: #E2E8F0; margin: 5px 0 0 0; font-size: 1.5rem;">₹{voucher_val:,.0f}</h3>
+                            <p style="color: #64748B; margin: 0; font-size: 12px;">₹{pt_data.get('voucher_rate', 0):.2f} / pt</p>
+                        </div>
+                        <div style="flex: 1; background: #34D399; border: none; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);">
+                            <p style="color: #040D08; margin: 0; font-size: 13px; font-weight: 700; text-transform: uppercase;">Travel Transfer</p>
+                            <h3 style="color: #040D08; margin: 5px 0 0 0; font-weight: 800; font-size: 1.5rem;">₹{travel_val:,.0f}</h3>
+                            <p style="color: #040D08; margin: 0; font-weight: 600; font-size: 12px;">₹{pt_data.get('travel_rate', 0):.2f} / pt</p>
+                        </div>
                     </div>
-                    <div style="flex: 1; background: #08100C; border: 1px solid rgba(52, 211, 153, 0.2); border-radius: 8px; padding: 15px; text-align: center;">
-                        <p style="color: #94A3B8; margin: 0; font-size: 13px; text-transform: uppercase;">Brand Vouchers</p>
-                        <h3 style="color: #E2E8F0; margin: 5px 0 0 0; font-size: 1.5rem;">₹{voucher_val:,.0f}</h3>
-                        <p style="color: #64748B; margin: 0; font-size: 12px;">₹{pt_data.get('voucher_rate', 0):.2f} / pt</p>
-                    </div>
-                    <div style="flex: 1; background: #34D399; border: none; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);">
-                        <p style="color: #040D08; margin: 0; font-size: 13px; font-weight: 700; text-transform: uppercase;">Travel Transfer</p>
-                        <h3 style="color: #040D08; margin: 5px 0 0 0; font-weight: 800; font-size: 1.5rem;">₹{travel_val:,.0f}</h3>
-                        <p style="color: #040D08; margin: 0; font-weight: 600; font-size: 12px;">₹{pt_data.get('travel_rate', 0):.2f} / pt</p>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
 
-                if max_val == cash_val and travel_val == 0 and voucher_val == 0:
-                    st.info("💡 **Cash is King:** This card is a pure cashback card. It provides direct statement credit optimally. Point transfers are not applicable.")
-                elif arbitrage > 0 and travel_val == max_val:
-                    st.success(f"💡 **Arbitrage Opportunity:** You are leaving **₹{arbitrage:,.0f}** on the table if you redeem for cash instead of transferring to **{pt_data.get('best_partner', 'Travel Partners')}**.")
-                elif arbitrage > 0 and voucher_val == max_val:
-                    st.success(f"💡 **Voucher Optimization:** You are leaving **₹{arbitrage:,.0f}** on the table if you redeem for cash instead of claiming Brand Vouchers.")
+                    if max_val == cash_val and travel_val == 0 and voucher_val == 0:
+                        st.info("💡 **Cash is King:** This card is a pure cashback card. It provides direct statement credit optimally. Point transfers are not applicable.")
+                    elif arbitrage > 0 and travel_val == max_val:
+                        st.success(f"💡 **Arbitrage Opportunity:** You are leaving **₹{arbitrage:,.0f}** on the table if you redeem for cash instead of transferring to **{pt_data.get('best_partner', 'Travel Partners')}**.")
+                    elif arbitrage > 0 and voucher_val == max_val:
+                        st.success(f"💡 **Voucher Optimization:** You are leaving **₹{arbitrage:,.0f}** on the table if you redeem for cash instead of claiming Brand Vouchers.")
 
         # --- TAB 7: PENALTY AUDIT ---
         with tab_audit:
@@ -646,31 +659,36 @@ def render_optimization_hub():
             else:
                 audit_card = st.selectbox("Select Card to Audit:", st.session_state.wallet, key="audit_card")
                 
-                with st.spinner(f"AI conducting forensic audit of {audit_card} terms and conditions..."):
-                    audit_data = get_fee_and_penalty_audit(audit_card)
+                # FIXED: STOPPED BACKGROUND API BURST WITH AN ACTION BUTTON
+                if st.button("Run Forensic Audit", key="btn_audit", type="primary"):
+                    with st.spinner(f"AI conducting forensic audit of {audit_card} terms and conditions..."):
+                        st.session_state[f"audit_{audit_card}"] = get_fee_and_penalty_audit(audit_card)
                 
-                st.markdown("---")
+                audit_data = st.session_state.get(f"audit_{audit_card}")
                 
-                a1, a2 = st.columns(2)
-                a1.markdown(f"**Annual / Joining Fee:**<br><span style='color:#34D399'>{audit_data.get('annual_fee', 'N/A')}</span>", unsafe_allow_html=True)
-                a2.markdown(f"**Interest Rate (APR):**<br><span style='color:#ef4444'>{audit_data.get('apr', 'N/A')}</span>", unsafe_allow_html=True)
-                
-                st.markdown("<br>", unsafe_allow_html=True)
-                
-                a3, a4 = st.columns(2)
-                a3.markdown(f"**Late Payment Fee Slabs:**<br><span style='color:#F59E0B'>{audit_data.get('late_fee', 'N/A')}</span>", unsafe_allow_html=True)
-                a4.markdown(f"**Over-limit Penalty:**<br><span style='color:#F59E0B'>{audit_data.get('overlimit', 'N/A')}</span>", unsafe_allow_html=True)
-                
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown(f"**ATM Cash Advance Charge (High Risk):**<br><span style='color:#ef4444'>{audit_data.get('cash_advance', 'N/A')}</span>", unsafe_allow_html=True)
+                if audit_data:
+                    st.markdown("---")
+                    
+                    a1, a2 = st.columns(2)
+                    a1.markdown(f"**Annual / Joining Fee:**<br><span style='color:#34D399'>{audit_data.get('annual_fee', 'N/A')}</span>", unsafe_allow_html=True)
+                    a2.markdown(f"**Interest Rate (APR):**<br><span style='color:#ef4444'>{audit_data.get('apr', 'N/A')}</span>", unsafe_allow_html=True)
+                    
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    
+                    a3, a4 = st.columns(2)
+                    a3.markdown(f"**Late Payment Fee Slabs:**<br><span style='color:#F59E0B'>{audit_data.get('late_fee', 'N/A')}</span>", unsafe_allow_html=True)
+                    a4.markdown(f"**Over-limit Penalty:**<br><span style='color:#F59E0B'>{audit_data.get('overlimit', 'N/A')}</span>", unsafe_allow_html=True)
+                    
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.markdown(f"**ATM Cash Advance Charge (High Risk):**<br><span style='color:#ef4444'>{audit_data.get('cash_advance', 'N/A')}</span>", unsafe_allow_html=True)
 
-                st.markdown(f"""
-                    <div style="margin-top: 25px; padding: 15px; border-left: 4px solid #ef4444; background-color: rgba(239, 68, 68, 0.1); border-radius: 5px;">
-                        <p style="color: #FCA5A5; margin: 0; font-size: 14px; line-height: 1.5;">
-                            <b>🚨 AI RED FLAG ADVISORY:</b> {audit_data.get('critical_warning', 'Review all terms carefully.')}
-                        </p>
-                    </div>
-                """, unsafe_allow_html=True)
+                    st.markdown(f"""
+                        <div style="margin-top: 25px; padding: 15px; border-left: 4px solid #ef4444; background-color: rgba(239, 68, 68, 0.1); border-radius: 5px;">
+                            <p style="color: #FCA5A5; margin: 0; font-size: 14px; line-height: 1.5;">
+                                <b>🚨 AI RED FLAG ADVISORY:</b> {audit_data.get('critical_warning', 'Review all terms carefully.')}
+                            </p>
+                        </div>
+                    """, unsafe_allow_html=True)
 
     # ==========================================
     # IF NOT LOGGED IN: Show Login/Signup form

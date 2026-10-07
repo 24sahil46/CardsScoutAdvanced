@@ -19,11 +19,9 @@ def get_gemini_model():
     global current_key_index
     active_key = KEY_POOL[current_key_index]
     
-    # Force the SDK to recognize your custom key name by injecting it into the environment
     os.environ["GEMINI_API_KEY"] = active_key
     genai.configure(api_key=active_key)
     
-    # Restored to Gemini 3.8 Flash!
     return genai.GenerativeModel('gemini-3.8-flash')
 
 def rotate_key():
@@ -35,21 +33,18 @@ def rotate_key():
         return True
     return False
 
+# ADDED CACHING TO STOP QUOTA DRAIN ON RERUNS
+@st.cache_data(ttl=86400, show_spinner=False)
 def generate_card_roadmap(user_data):
-    """
-    Searches web context and generates recommendations.
-    Automatically rotates through the API key pool if a 429 quota error occurs.
-    """
+    """Searches web context and generates recommendations."""
     attempts = 0
     max_attempts = len(KEY_POOL)
 
     while attempts < max_attempts:
         try:
-            # 1. Fetch fresh web context via Tavily
             query = f"Best credit cards in India 2026 for {user_data.get('occ', 'professional')} with {user_data.get('income', 50000)} monthly income."
             web_data = tavily.search(query=query, search_depth="advanced")
             
-            # 2. Formulate Prompt
             prompt = f"""
             Act as an Expert Financial Advisor.
             User Profile: {user_data}
@@ -62,8 +57,6 @@ def generate_card_roadmap(user_data):
 
             Format your entire response clearly using standard markdown.
             """
-            
-            # 3. Call active model
             model = get_gemini_model()
             response = model.generate_content(prompt)
             return response.text
@@ -72,15 +65,18 @@ def generate_card_roadmap(user_data):
             error_message = str(e)
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
-                rotated = rotate_key()
-                if rotated and attempts < max_attempts:
-                    continue  # Retry instantly with the next key
+                if rotate_key() and attempts < max_attempts:
+                    import time
+                    time.sleep(2)
+                    continue
             return f"Error generating roadmap: {error_message}"
 
     return "All configured Gemini API keys have exceeded their current quota. Please try again shortly."
 
+# ADDED CACHING TO STOP QUOTA DRAIN ON RERUNS
+@st.cache_data(ttl=86400, show_spinner=False)
 def generate_battle_analysis(entered_card, original_recommendation, user_data):
-    """Compares an entered card against the top recommendation with key rotation."""
+    """Compares an entered card against the top recommendation."""
     attempts = 0
     max_attempts = len(KEY_POOL)
 
@@ -102,6 +98,8 @@ def generate_battle_analysis(entered_card, original_recommendation, user_data):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
+                    import time
+                    time.sleep(2)
                     continue
             return f"Error during battle analysis: {error_message}"
 
@@ -147,41 +145,30 @@ def get_forex_markup(card_name):
             model = get_gemini_model()
             response = model.generate_content(prompt)
             
-            # Extract the number safely
             numbers = re.findall(r"[-+]?\d*\.\d+|\d+", response.text)
             if numbers:
                 rate = float(numbers[0])
-                # Cap at 5.0% to prevent AI hallucinations from breaking the math
                 return min(rate, 5.0)
             return 3.5 
             
         except Exception as e:
             error_message = str(e)
-            # If we hit a rate limit, rotate to the next API key
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
                     import time
                     time.sleep(2)
                     continue
-            return 3.5 # Fallback if non-quota error occurs
+            return 3.5 
 
-    return 3.5 # Fallback if all keys are exhausted
+    return 3.5 
 
-# ---> UPDATED CO-PILOT FUNCTION <---
-def get_copilot_verdict(query, wallet, card_limits):
-    """
-    Evaluates an impromptu expense against the user's wallet and strict credit limits.
-    """
+# ADDED CACHING TO STOP QUOTA DRAIN ON RERUNS
+@st.cache_data(ttl=86400, show_spinner=False)
+def get_copilot_verdict(query, wallet_context):
+    """Evaluates an impromptu expense against the user's wallet."""
     attempts = 0
     max_attempts = len(KEY_POOL)
-
-    # Format the wallet with their respective limits
-    wallet_context = ""
-    if wallet:
-        wallet_context = "\n".join([f"- {card} (Monthly Limit: ₹{card_limits.get(card, 'Unknown')})" for card in wallet])
-    else:
-        wallet_context = "No cards in wallet."
 
     while attempts < max_attempts:
         try:
@@ -220,11 +207,9 @@ def fetch_live_card_offers(card_name):
 
     while attempts < max_attempts:
         try:
-            # 1. Search the web including Trains and Fuel
             query = f"Latest active offers, sales, and discounts for {card_name} credit card in India on Amazon, Flipkart, Swiggy, Zomato, MakeMyTrip, IRCTC Train Booking, Indigo/AirIndia Flights, and HPCL/BPCL/IOCL Fuel 2026"
             web_data = tavily.search(query=query, search_depth="basic")
             
-            # 2. Ask Gemini to output raw HTML/CSS Coupon Cards
             prompt = f"""
             Based on the following live web data: {web_data}
             
@@ -381,7 +366,6 @@ def get_reward_point_values(card_name):
             model = get_gemini_model()
             response = model.generate_content(prompt)
             
-            # Clean and parse JSON
             cleaned_text = response.text.replace("```json", "").replace("```", "").strip()
             data = json.loads(cleaned_text)
             return data
