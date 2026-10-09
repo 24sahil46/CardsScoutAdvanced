@@ -331,9 +331,46 @@ def render_step_2():
                     "spending_categories": spend_values, "existing_banks": existing_bank,
                     "existing_card": current_card_name, "reward_type": reward_type, "pref": pref
                 })
-                st.session_state.step = 3
+                
+                # --- SMART CACHE LOGIC & ROUTING TO LOADING SCREEN ---
+                current_data_str = json.dumps(st.session_state.user_data, sort_keys=True, default=str)
+                
+                if "final_recommendation" in st.session_state and st.session_state.get("last_data_str") == current_data_str:
+                    # Data didn't change! Skip loading screen
+                    st.session_state.step = 3
+                else:
+                    # New or changed data -> Go to Loading Screen
+                    st.session_state.last_data_str = current_data_str
+                    st.session_state.step = "loading"
+                    
                 st.rerun()
 
+def render_step_loading():
+    """Dedicated Loading Page to prevent UI overlaps."""
+    st.markdown("<br><br><br><br>", unsafe_allow_html=True)
+    _, center, _ = st.columns([1, 2, 1])
+    
+    with center:
+        st.markdown("""
+            <div style='text-align: center; background: rgba(0,0,0,0.6); padding: 40px; border-radius: 16px; border: 1px solid rgba(52, 211, 153, 0.3); box-shadow: 0 10px 40px rgba(0,0,0,0.8);'>
+                <h2 style='color: #34D399; margin-bottom: 10px;'>🔍 Analyzing your financial roadmap...</h2>
+                <p style='color: #94A3B8; font-size: 1.1rem;'>Our AI is scanning millions of data points to find your perfect match. Please wait.</p>
+            </div>
+            <br>
+        """, unsafe_allow_html=True)
+        
+        with st.spinner("Processing Web Data & Yield Calculations..."):
+            result = generate_card_roadmap(st.session_state.user_data)
+            
+            if "Error" in result:
+                st.error(result)
+                if st.button("Try Again", type="secondary"):
+                    st.session_state.step = 2
+                    st.rerun()
+            else:
+                st.session_state.final_recommendation = result
+                st.session_state.step = 3
+                st.rerun()
 
 def render_step_3():
     data = st.session_state.user_data
@@ -436,31 +473,6 @@ def render_step_3():
 
     st.markdown("---")
 
-    # Smart Caching & Generation
-    current_data_str = json.dumps(data, sort_keys=True, default=str)
-    needs_generation = False
-    
-    if "final_recommendation" not in st.session_state:
-        needs_generation = True
-    elif st.session_state.get("last_data_str") != current_data_str:
-        needs_generation = True
-
-    if needs_generation:
-        with st.status("🤖 AI is analyzing the latest web data for your roadmap...", expanded=True) as status_bar:
-            st.write("Extracting profile metrics...")
-            st.write("Searching for live card offers...")
-            
-            result = generate_card_roadmap(data)
-            
-            if "Error" in result:
-                status_bar.update(label="❌ Analysis Failed", state="error")
-                st.error(result)
-                st.stop()
-            else:
-                st.session_state.final_recommendation = result
-                st.session_state.last_data_str = current_data_str
-                status_bar.update(label="✅ Roadmap Generated!", state="complete", expanded=False)
-
     # Render Roadmap
     if "final_recommendation" in st.session_state:
         st.markdown("""
@@ -516,5 +528,7 @@ def render_guest_scout():
         render_step_1()
     elif current_step == 2:
         render_step_2()
+    elif current_step == "loading":
+        render_step_loading()
     elif current_step == 3:
         render_step_3()
