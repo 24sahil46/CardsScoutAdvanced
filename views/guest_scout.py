@@ -482,29 +482,35 @@ def render_guest_scout():
                 st.session_state.step = 1
                 st.rerun()
 
-        # --- NEW CSS FOR METRIC CARDS (BULLETPROOF EQUAL HEIGHT & THEME) ---
+        # --- NEW CSS FOR METRIC CARDS (BULLETPROOF EQUAL HEIGHT & VISIBLE THEME) ---
         import base64
         import os
         
+        # Smart path routing: Try root directory first, fallback to relative
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        bg_path = os.path.join(root_dir, "card.png")
+        if not os.path.exists(bg_path):
+            bg_path = "card.png"
+            
         metric_bg_css = ""
-        # Using card.png for a subtle, premium texture
-        bg_path = "card.png" 
         if os.path.exists(bg_path):
             with open(bg_path, "rb") as f:
                 encoded_bg = base64.b64encode(f.read()).decode().replace('\n', '')
-                # 88% to 95% dark gradient overlay so the text remains perfectly readable
-                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.88), rgba(4, 13, 8, 0.95)), url(data:image/png;base64,{encoded_bg}) !important;"
+                # REDUCED OPACITY (0.4 to 0.75) so the texture is actually visible!
+                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.4), rgba(4, 13, 8, 0.75)), url('data:image/png;base64,{encoded_bg}') !important;"
+        else:
+            print(f"⚠️ UI Warning: Could not find {bg_path} to load into the metric cards.")
 
         st.markdown(f"""
             <style>
             /* 1. Target specifically the containers inside the 3 columns */
             div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] {{
-                height: 290px !important; /* Fixed height for all 3 cards */
-                background-color: rgba(4, 13, 8, 0.9) !important;
+                height: 290px !important;
+                background-color: transparent !important; /* Cleared solid color so image shows */
                 {metric_bg_css}
                 background-size: cover !important;
                 background-position: center !important;
-                border: 1px solid rgba(212, 175, 55, 0.5) !important; /* Metallic Gold Border */
+                border: 1px solid rgba(212, 175, 55, 0.5) !important;
                 border-radius: 16px !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
                 transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
@@ -516,14 +522,14 @@ def render_guest_scout():
                 box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 15px rgba(212, 175, 55, 0.2) !important;
             }}
 
-            /* 2. MAGIC FIX: Force Streamlit's inner div to be a Flexbox container */
+            /* 2. Force Streamlit's inner div to be a Flexbox container */
             div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] {{
                 display: flex !important;
                 flex-direction: column !important;
                 height: 100% !important;
             }}
 
-            /* 3. MAGIC FIX: Push the last element (the button or metric) to the very bottom */
+            /* 3. Push the last element (the button or metric) to the very bottom */
             div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] > div:last-child {{
                 margin-top: auto !important;
             }}
