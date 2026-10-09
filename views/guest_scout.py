@@ -3,7 +3,7 @@ import streamlit as st
 import json
 import base64
 import os
-import time
+from core.ai_agent import generate_card_roadmap, generate_battle_analysis
 
 def apply_master_theme():
     """Injects the global CSS styling for the Guest Scout flow."""
@@ -336,8 +336,6 @@ def render_step_2():
 
 
 def render_step_3():
-    from core.ai_agent import generate_card_roadmap, generate_battle_analysis
-    
     data = st.session_state.user_data
     spends = data.get('spending_categories', {})
 
@@ -499,7 +497,10 @@ def render_step_3():
         st.link_button("🟢 Share via WhatsApp", wa_url, use_container_width=True)
         st.link_button("📧 Share via Email", mail_url, use_container_width=True)
 
-# Main Execution Flow Controller
+
+# ==========================================
+# MASTER EXECUTION CONTROLLER
+# ==========================================
 def render_guest_scout():
     if 'step' not in st.session_state:
         st.session_state.step = 1
@@ -507,10 +508,13 @@ def render_guest_scout():
         st.session_state.user_data = {}
 
     apply_master_theme()
+    
+    # Store locally to mathematically guarantee only one renders per run
+    current_step = st.session_state.step
 
-    if st.session_state.step == 1:
+    if current_step == 1:
         render_step_1()
-    elif st.session_state.step == 2:
+    elif current_step == 2:
         render_step_2()
-    elif st.session_state.step == 3:
+    elif current_step == 3:
         render_step_3()
