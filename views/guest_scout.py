@@ -1,5 +1,9 @@
 # views/guest_scout.py
 import streamlit as st
+import json
+import base64
+import os
+import time
 
 def render_guest_scout():
     # --- Navigation Logic ---
@@ -55,7 +59,6 @@ def render_guest_scout():
         }
 
         /* --- 3. UNIVERSAL INPUT FIELDS (Text, Number, Select, MultiSelect) --- */
-        /* The Outer Wrapper */
         .stTextInput > div > div > div,
         .stNumberInput > div > div > div,
         .stSelectbox > div > div > div,
@@ -68,7 +71,6 @@ def render_guest_scout():
             box-shadow: none !important;
         }
 
-        /* The Internal Input Area */
         .stTextInput input,
         .stNumberInput input,
         [data-baseweb="base-input"],
@@ -80,12 +82,10 @@ def render_guest_scout():
             border: none !important;
         }
 
-        /* Dropdown Arrow Background Killer */
         div[data-baseweb="select"] > div:first-child > div:last-child {
             background-color: transparent !important;
         }
 
-        /* Hover & Focus States (Mint Green Glow) */
         .stTextInput > div > div > div:hover,
         .stSelectbox > div > div > div:hover,
         .stMultiSelect > div > div > div:hover,
@@ -97,7 +97,6 @@ def render_guest_scout():
             box-shadow: 0 0 8px rgba(52, 211, 153, 0.25) !important;
         }
 
-        /* Dropdown Popover Menus */
         div[data-baseweb="popover"] > div,
         ul[data-baseweb="menu"] {
             background-color: #08100C !important; 
@@ -117,7 +116,6 @@ def render_guest_scout():
             color: #34D399 !important;
         }
 
-        /* Number Input (+ / -) Buttons */
         [data-testid="stNumberInputStepDown"],
         [data-testid="stNumberInputStepUp"] {
             background: transparent !important;
@@ -155,7 +153,7 @@ def render_guest_scout():
             background-color: #34D399 !important; 
             color: #040D08 !important; 
             border: none !important;
-            border-radius: 30px !important; /* Restored Pill Shape */
+            border-radius: 30px !important;
             height: 48px !important;
             font-weight: 700 !important;
             font-size: 1.05rem !important;
@@ -173,7 +171,7 @@ def render_guest_scout():
             background-color: rgba(255, 255, 255, 0.05) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             color: #FFFFFF !important;
-            border-radius: 30px !important; /* Restored Pill Shape */
+            border-radius: 30px !important;
             height: 48px !important;
             font-weight: 600 !important;
             transition: all 0.2s ease !important;
@@ -185,7 +183,6 @@ def render_guest_scout():
         }
 
         /* --- 6. BUG FIXES & ICON CLEANSING --- */
-        /* Hides broken text/icons in inputs */
         [data-testid="stTextInput"] div[data-baseweb="input"] > *:not([data-baseweb="base-input"]) {
             color: transparent !important; 
             font-size: 0px !important;
@@ -408,7 +405,6 @@ def render_guest_scout():
                 st.divider()
                 col_back, col_space, col_next = st.columns([3, 4, 3])
                 
-                # BOTH buttons are now Primary (Mint Green) as requested!
                 if col_back.button("Back", type="primary", use_container_width=True):
                     st.session_state.step = 1
                     st.rerun()
@@ -429,10 +425,6 @@ def render_guest_scout():
     # ==========================================
     elif st.session_state.step == 3:
         from core.ai_agent import generate_card_roadmap, generate_battle_analysis
-        import time
-        import json
-        import base64
-        import os
         
         data = st.session_state.user_data
         spends = data.get('spending_categories', {})
@@ -486,7 +478,6 @@ def render_guest_scout():
 
         st.markdown(f"""
             <style>
-            /* Apply styling to ALL border containers inside columns (Highly Resilient) */
             [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] {{
                 height: 290px !important;
                 {metric_bg_css}
@@ -505,7 +496,6 @@ def render_guest_scout():
                 transform: translateY(-4px) !important;
             }}
             
-            /* Target Streamlit's inner block to act as a flex container */
             [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] {{
                 display: flex !important;
                 flex-direction: column !important;
@@ -550,7 +540,6 @@ def render_guest_scout():
                 user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed", placeholder="e.g., SBI Cashback")
                 st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True)
                 if st.button("Battle Now", type="primary", use_container_width=True):
-                    # Uses the generated report for comparison
                     recommendation_text = st.session_state.get("final_recommendation", "Our top recommended card.")
                     if user_card:
                         battle_popup(user_card, recommendation_text, data)
@@ -561,7 +550,6 @@ def render_guest_scout():
         current_data_str = json.dumps(data, sort_keys=True, default=str)
         needs_generation = False
         
-        # Trigger generation if it's our first time OR if the user went back and changed a number
         if "final_recommendation" not in st.session_state:
             needs_generation = True
         elif st.session_state.get("last_data_str") != current_data_str:
@@ -579,12 +567,9 @@ def render_guest_scout():
                     st.error(result)
                     st.stop()
                 else:
-                    # Update session state with the new data
                     st.session_state.final_recommendation = result
                     st.session_state.last_data_str = current_data_str
                     status_bar.update(label="✅ Roadmap Generated!", state="complete", expanded=False)
-                    # Notice we DO NOT use st.rerun() here! 
-                    # The code just continues flowing down to render the roadmap immediately.
 
         # --- 5. RENDER ROADMAP ---
         if "final_recommendation" in st.session_state:
@@ -600,7 +585,6 @@ def render_guest_scout():
         c1, c2, c3 = st.columns(3)
         
         if c1.button("Start New Scout", type="secondary", use_container_width=True, key="reset_p3"):
-            # HARD RESET: Clears cache completely to start over
             if "final_recommendation" in st.session_state:
                 del st.session_state.final_recommendation
             if "last_data_str" in st.session_state:
