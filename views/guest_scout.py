@@ -482,45 +482,50 @@ def render_guest_scout():
                 st.session_state.step = 1
                 st.rerun()
 
-        # --- NEW CSS FOR METRIC CARDS (EQUAL HEIGHT & HOMEPAGE STYLING) ---
+        # --- NEW CSS FOR METRIC CARDS (BULLETPROOF EQUAL HEIGHT & THEME) ---
         import base64
         import os
         
         metric_bg_css = ""
-        bg_path = "card.png"  # Reusing the Guest Scout background texture
+        # Using card.png for a subtle, premium texture
+        bg_path = "card.png" 
         if os.path.exists(bg_path):
             with open(bg_path, "rb") as f:
                 encoded_bg = base64.b64encode(f.read()).decode().replace('\n', '')
-                # Blend a dark overlay with the background image
-                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.85), rgba(4, 13, 8, 0.9)), url(data:image/png;base64,{encoded_bg}) !important;"
+                # 88% to 95% dark gradient overlay so the text remains perfectly readable
+                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.88), rgba(4, 13, 8, 0.95)), url(data:image/png;base64,{encoded_bg}) !important;"
 
         st.markdown(f"""
             <style>
-            /* Target ONLY the 3 metric containers in the main area (excludes sidebar) */
-            section.main div[data-testid="stVerticalBlockBorderWrapper"] {{
-                height: 285px !important; /* Force all 3 cards to be exactly this tall */
-                background-color: rgba(4, 13, 8, 0.85) !important;
+            /* 1. Target specifically the containers inside the 3 columns */
+            div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] {{
+                height: 290px !important; /* Fixed height for all 3 cards */
+                background-color: rgba(4, 13, 8, 0.9) !important;
                 {metric_bg_css}
                 background-size: cover !important;
                 background-position: center !important;
-                border: 1px solid rgba(212, 175, 55, 0.6) !important; /* Gold border like Homepage */
+                border: 1px solid rgba(212, 175, 55, 0.5) !important; /* Metallic Gold Border */
                 border-radius: 16px !important;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
-                transition: transform 0.3s ease, border-color 0.3s ease;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
+                transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
             }}
             
-            /* Add a subtle hover lift effect */
-            section.main div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
-                border-color: rgba(212, 175, 55, 0.9) !important;
-                transform: translateY(-5px);
+            div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
+                border-color: rgba(212, 175, 55, 1) !important;
+                transform: translateY(-4px) !important;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 15px rgba(212, 175, 55, 0.2) !important;
             }}
 
-            /* Flex layout to push the Battleground button perfectly to the bottom */
-            section.main div[data-testid="stVerticalBlockBorderWrapper"] > div {{
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                height: 100%;
+            /* 2. MAGIC FIX: Force Streamlit's inner div to be a Flexbox container */
+            div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] {{
+                display: flex !important;
+                flex-direction: column !important;
+                height: 100% !important;
+            }}
+
+            /* 3. MAGIC FIX: Push the last element (the button or metric) to the very bottom */
+            div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] > div:last-child {{
+                margin-top: auto !important;
             }}
             </style>
         """, unsafe_allow_html=True)
@@ -533,7 +538,6 @@ def render_guest_scout():
                 st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>💰 Reward Potential</h3>", unsafe_allow_html=True)
                 total_monthly_spend = sum(spends.values()) if spends else 0
                 annual_savings = (total_monthly_spend * 0.03) * 12 
-                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True) # Spacer
                 st.metric(label="Total Annual Savings", value=f"₹{int(annual_savings):,}", delta="Optimized Rewards")
 
         with col_odds:
@@ -541,7 +545,6 @@ def render_guest_scout():
                 st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>🎯 Approval Odds</h3>", unsafe_allow_html=True)
                 score = data.get('credit', '< 700')
                 odds, status, color = ("35%", "Challenging", "inverse") if score == "< 700" else ("85%", "Strong", "normal")
-                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True) # Spacer
                 st.metric(label="Likelihood for Top Pick", value=odds, delta=status, delta_color=color)
 
         @st.dialog("⚔️ Card Battle: Peer-to-Peer Analysis", width="large")
@@ -557,12 +560,7 @@ def render_guest_scout():
             with st.container(border=True):
                 st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>🤖 The Battleground</h3>", unsafe_allow_html=True)
                 st.write("Compare cards vs. Our Top pick.")
-                
-                # Added placeholder text for a sleeker look
-                user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed", placeholder="e.g., SBI Cashback")
-                
-                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True) # Pushes button to bottom
-                
+                user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed", placeholder="e.g., SBI Cashback Credit Card")
                 if st.button("Battle Now", type="primary", use_container_width=True):
                     if user_card:
                         battle_popup(user_card, st.session_state.final_recommendation, data)
