@@ -482,21 +482,66 @@ def render_guest_scout():
                 st.session_state.step = 1
                 st.rerun()
 
+        # --- NEW CSS FOR METRIC CARDS (EQUAL HEIGHT & HOMEPAGE STYLING) ---
+        import base64
+        import os
+        
+        metric_bg_css = ""
+        bg_path = "card.png"  # Reusing the Guest Scout background texture
+        if os.path.exists(bg_path):
+            with open(bg_path, "rb") as f:
+                encoded_bg = base64.b64encode(f.read()).decode().replace('\n', '')
+                # Blend a dark overlay with the background image
+                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.85), rgba(4, 13, 8, 0.9)), url(data:image/png;base64,{encoded_bg}) !important;"
+
+        st.markdown(f"""
+            <style>
+            /* Target ONLY the 3 metric containers in the main area (excludes sidebar) */
+            section.main div[data-testid="stVerticalBlockBorderWrapper"] {{
+                height: 285px !important; /* Force all 3 cards to be exactly this tall */
+                background-color: rgba(4, 13, 8, 0.85) !important;
+                {metric_bg_css}
+                background-size: cover !important;
+                background-position: center !important;
+                border: 1px solid rgba(212, 175, 55, 0.6) !important; /* Gold border like Homepage */
+                border-radius: 16px !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+                transition: transform 0.3s ease, border-color 0.3s ease;
+            }}
+            
+            /* Add a subtle hover lift effect */
+            section.main div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
+                border-color: rgba(212, 175, 55, 0.9) !important;
+                transform: translateY(-5px);
+            }}
+
+            /* Flex layout to push the Battleground button perfectly to the bottom */
+            section.main div[data-testid="stVerticalBlockBorderWrapper"] > div {{
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 100%;
+            }}
+            </style>
+        """, unsafe_allow_html=True)
+
         # Top Metrics
         col_rewards, col_odds, col_battle = st.columns(3, gap="medium")
 
         with col_rewards:
             with st.container(border=True):
-                st.markdown("<h3 style='color: #34D399; font-size: 1.1rem; margin-bottom: 5px;'>💰 Reward Potential</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>💰 Reward Potential</h3>", unsafe_allow_html=True)
                 total_monthly_spend = sum(spends.values()) if spends else 0
                 annual_savings = (total_monthly_spend * 0.03) * 12 
+                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True) # Spacer
                 st.metric(label="Total Annual Savings", value=f"₹{int(annual_savings):,}", delta="Optimized Rewards")
 
         with col_odds:
             with st.container(border=True):
-                st.markdown("<h3 style='color: #34D399; font-size: 1.1rem; margin-bottom: 5px;'>🎯 Approval Odds</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>🎯 Approval Odds</h3>", unsafe_allow_html=True)
                 score = data.get('credit', '< 700')
                 odds, status, color = ("35%", "Challenging", "inverse") if score == "< 700" else ("85%", "Strong", "normal")
+                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True) # Spacer
                 st.metric(label="Likelihood for Top Pick", value=odds, delta=status, delta_color=color)
 
         @st.dialog("⚔️ Card Battle: Peer-to-Peer Analysis", width="large")
@@ -510,9 +555,14 @@ def render_guest_scout():
 
         with col_battle:
             with st.container(border=True):
-                st.markdown("<h3 style='color: #34D399; font-size: 1.1rem; margin-bottom: 5px;'>🤖 The Battleground</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>🤖 The Battleground</h3>", unsafe_allow_html=True)
                 st.write("Compare cards vs. Our Top pick.")
-                user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed")
+                
+                # Added placeholder text for a sleeker look
+                user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed", placeholder="e.g., SBI Cashback")
+                
+                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True) # Pushes button to bottom
+                
                 if st.button("Battle Now", type="primary", use_container_width=True):
                     if user_card:
                         battle_popup(user_card, st.session_state.final_recommendation, data)
