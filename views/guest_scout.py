@@ -419,7 +419,7 @@ def render_guest_scout():
                     })
                     st.session_state.step = 3
                     st.rerun()
-                    
+
     # ==========================================
     # PAGE 3: THE PODIUM & AI DASHBOARD
     # ==========================================
