@@ -430,14 +430,23 @@ def render_guest_scout():
     elif st.session_state.step == 3:
         from core.ai_agent import generate_card_roadmap, generate_battle_analysis
         import time
+        import json
+        import base64
+        import os
         
         data = st.session_state.user_data
         spends = data.get('spending_categories', {})
+
+        # --- 1. TOP LEFT BACK NAVIGATION ---
+        col_back, _ = st.columns([1.5, 8])
+        if col_back.button("⬅️ Back to Edit", type="secondary"):
+            st.session_state.step = 2
+            st.rerun()
         
         _, center_column, _ = st.columns([0.5, 3, 0.5])
         with center_column:
             st.markdown("""
-                <div style="text-align: center; margin-bottom: 25px;">
+                <div style="text-align: center; margin-bottom: 25px; margin-top: -20px;">
                     <h1 class='scout-title'>
                         <span style="color: #FFFFFF;">Intelligence </span><span style="color: #34D399;">Hub</span>
                     </h1>
@@ -445,7 +454,12 @@ def render_guest_scout():
                 </div>
             """, unsafe_allow_html=True)
 
-            if "final_recommendation" not in st.session_state:
+            # --- 2. SMART CACHING (SAVES API CALLS) ---
+            # Create a string signature of the current inputs
+            current_data_str = json.dumps(data, sort_keys=True, default=str)
+
+            # Generate ONLY if there's no report OR if the user changed their inputs
+            if "final_recommendation" not in st.session_state or st.session_state.get("last_data_str") != current_data_str:
                 time.sleep(0.1) 
                 status_container = st.empty()
                 
@@ -457,6 +471,7 @@ def render_guest_scout():
                         st.stop()
                     else:
                         st.session_state.final_recommendation = result
+                        st.session_state.last_data_str = current_data_str # SAVE INPUT SIGNATURE
                         status_bar.update(label="✅ Roadmap Generated!", state="complete", expanded=False)
                         status_container.empty()
                         st.rerun()
@@ -477,61 +492,45 @@ def render_guest_scout():
                 st.write(f"**Monthly Income:** ₹{data.get('income', 0):,}")
 
             if st.button("Edit Profile", type="secondary", use_container_width=True):
-                if "final_recommendation" in st.session_state:
-                    del st.session_state.final_recommendation
                 st.session_state.step = 1
                 st.rerun()
 
-        # --- NEW CSS FOR METRIC CARDS (BULLETPROOF EQUAL HEIGHT & VISIBLE THEME) ---
-        import base64
-        import os
-        
-        # Smart path routing: Try root directory first, fallback to relative
-        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        bg_path = os.path.join(root_dir, "card.png")
-        if not os.path.exists(bg_path):
-            bg_path = "card.png"
-            
-        metric_bg_css = ""
-        if os.path.exists(bg_path):
-            with open(bg_path, "rb") as f:
-                encoded_bg = base64.b64encode(f.read()).decode().replace('\n', '')
-                # REDUCED OPACITY (0.4 to 0.75) so the texture is actually visible!
-                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.4), rgba(4, 13, 8, 0.75)), url('data:image/png;base64,{encoded_bg}') !important;"
-        else:
-            print(f"⚠️ UI Warning: Could not find {bg_path} to load into the metric cards.")
+        # --- 3. BULLETPROOF METRIC STYLING ---
+        # Safe gradient fallback just in case the image cannot be found
+        metric_bg_css = "background-image: linear-gradient(145deg, #0A1611, #040D08) !important;"
+        if os.path.exists("card.png"):
+            with open("card.png", "rb") as f:
+                encoded_bg = base64.b64encode(f.read()).decode()
+                # 60% to 90% fade so the image shows clearly behind the text
+                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.6), rgba(4, 13, 8, 0.9)), url('data:image/png;base64,{encoded_bg}') !important;"
 
         st.markdown(f"""
             <style>
-            /* 1. Target specifically the containers inside the 3 columns */
-            div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] {{
+            /* Apply styling to ALL border containers inside columns (Highly Resilient) */
+            [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] {{
                 height: 290px !important;
-                background-color: transparent !important; /* Cleared solid color so image shows */
                 {metric_bg_css}
                 background-size: cover !important;
                 background-position: center !important;
-                border: 1px solid rgba(212, 175, 55, 0.5) !important;
+                border: 1px solid rgba(212, 175, 55, 0.6) !important;
                 border-radius: 16px !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
-                transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+                transition: all 0.3s ease !important;
+                display: flex !important;
+                flex-direction: column !important;
             }}
             
-            div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"]:hover {{
+            [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"]:hover {{
                 border-color: rgba(212, 175, 55, 1) !important;
                 transform: translateY(-4px) !important;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 15px rgba(212, 175, 55, 0.2) !important;
             }}
-
-            /* 2. Force Streamlit's inner div to be a Flexbox container */
-            div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] {{
+            
+            /* Target Streamlit's inner block to act as a flex container */
+            [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] {{
                 display: flex !important;
                 flex-direction: column !important;
                 height: 100% !important;
-            }}
-
-            /* 3. Push the last element (the button or metric) to the very bottom */
-            div[data-testid="column"] > div[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] > div:last-child {{
-                margin-top: auto !important;
+                justify-content: space-between !important;
             }}
             </style>
         """, unsafe_allow_html=True)
@@ -544,6 +543,7 @@ def render_guest_scout():
                 st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>💰 Reward Potential</h3>", unsafe_allow_html=True)
                 total_monthly_spend = sum(spends.values()) if spends else 0
                 annual_savings = (total_monthly_spend * 0.03) * 12 
+                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True) 
                 st.metric(label="Total Annual Savings", value=f"₹{int(annual_savings):,}", delta="Optimized Rewards")
 
         with col_odds:
@@ -551,6 +551,7 @@ def render_guest_scout():
                 st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>🎯 Approval Odds</h3>", unsafe_allow_html=True)
                 score = data.get('credit', '< 700')
                 odds, status, color = ("35%", "Challenging", "inverse") if score == "< 700" else ("85%", "Strong", "normal")
+                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True)
                 st.metric(label="Likelihood for Top Pick", value=odds, delta=status, delta_color=color)
 
         @st.dialog("⚔️ Card Battle: Peer-to-Peer Analysis", width="large")
@@ -566,7 +567,8 @@ def render_guest_scout():
             with st.container(border=True):
                 st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>🤖 The Battleground</h3>", unsafe_allow_html=True)
                 st.write("Compare cards vs. Our Top pick.")
-                user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed", placeholder="e.g., SBI Cashback Credit Card")
+                user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed", placeholder="e.g., SBI Cashback")
+                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True)
                 if st.button("Battle Now", type="primary", use_container_width=True):
                     if user_card:
                         battle_popup(user_card, st.session_state.final_recommendation, data)
@@ -586,8 +588,12 @@ def render_guest_scout():
         c1, c2, c3 = st.columns(3)
         
         if c1.button("Start New Scout", type="secondary", use_container_width=True, key="reset_p3"):
+            # 4. HARD RESET: Clears cache and memory when starting entirely over
             if "final_recommendation" in st.session_state:
                 del st.session_state.final_recommendation
+            if "last_data_str" in st.session_state:
+                del st.session_state.last_data_str
+            st.session_state.user_data = {}
             st.session_state.step = 1
             st.rerun()
 

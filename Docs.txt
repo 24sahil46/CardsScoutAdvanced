@@ -24,7 +24,7 @@ Tab 6: 💎 Reward Point Conversion Matrix (The "Arbitrage Engine")The Problem: 
  Postgres database
 
 git add .
-git commit -m "Bug Fixeds "
+git commit -m "Bug Fixed "
 git push origin main
 
 #08100C
