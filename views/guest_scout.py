@@ -24,7 +24,7 @@ def render_guest_scout():
                     100% { text-shadow: 0 0 10px rgba(6, 182, 212, 0.2), 0 0 20px rgba(6, 182, 212, 0.1); }
                 }
                 .glow-text {
-                    font-size: 2.5rem; 
+                    font-size: 2.5rem; /* <-- Adjusted to a normal, clean size */
                     font-weight: 900; 
                     margin-bottom: 0; 
                     padding-bottom: 0; 
@@ -205,27 +205,25 @@ def render_guest_scout():
                     
     # --- PAGE 3: THE PODIUM & AI DASHBOARD ---
     elif st.session_state.step == 3:
-        # Import our new AI agent and necessary tools
+        # Import our new AI agent
         from core.ai_agent import generate_card_roadmap, generate_battle_analysis
-        import json
-        import base64
-        import os
+        import time
         
         data = st.session_state.user_data
         spends = data.get('spending_categories', {})
 
-        # --- 1. TOP LEFT BACK NAVIGATION ---
+        # NEW: Edit Profile Button placed at the top left of Step 3
         col_back, _ = st.columns([2, 8])
         with col_back:
-            if st.button("⬅️ Edit Profile", use_container_width=True):
+            if st.button("Edit Profile", icon=":material/arrow_back:", use_container_width=True):
                 st.session_state.step = 2
                 st.rerun()
         
-        # 2. Title
+        # 1. Title
         _, center_column, _ = st.columns([0.5, 3, 0.5])
         with center_column:
             st.markdown("""
-                <div style="text-align: center; margin-bottom: 25px; margin-top: -10px;">
+                <div style="text-align: center; margin-bottom: 25px;">
                     <h4 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0; padding-bottom: 0;">
                         🧭 <span style="background: linear-gradient(90deg, #3b82f6, #06B6D4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                             CardScout's Intelligence Hub
@@ -233,6 +231,24 @@ def render_guest_scout():
                     </h4>
                 </div>
             """, unsafe_allow_html=True)
+
+            # 2. Secure Execution of AI Generation
+            if "final_recommendation" not in st.session_state:
+                time.sleep(0.1) # UI Settle
+                status_container = st.empty()
+                
+                with status_container.status("🔍 Analyzing your financial roadmap...", expanded=True) as status_bar:
+                    # Call our isolated core function
+                    result = generate_card_roadmap(data)
+                    
+                    if "Error" in result:
+                        st.error(result)
+                        st.stop()
+                    else:
+                        st.session_state.final_recommendation = result
+                        status_bar.update(label="✅ Roadmap Generated!", state="complete", expanded=False)
+                        status_container.empty()
+                        st.rerun()
 
         # 3. Sidebar Snapshot
         with st.sidebar:
@@ -249,50 +265,13 @@ def render_guest_scout():
                 st.write(f"**Name:** {data.get('name', 'User')}")
                 st.write(f"**Monthly Income:** ₹{data.get('income', 0):,}")
 
-            if st.button("Edit Profile (Sidebar)", icon=":material/edit:", use_container_width=True):
+            if st.button("Edit Profile", icon=":material/edit:", use_container_width=True):
+                if "final_recommendation" in st.session_state:
+                    del st.session_state.final_recommendation
                 st.session_state.step = 1
                 st.rerun()
 
-        # --- 4. BULLETPROOF METRIC STYLING ---
-        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        bg_path = os.path.join(root_dir, "card.png")
-        if not os.path.exists(bg_path): 
-            bg_path = "card.png"
-
-        metric_bg_css = "background-image: linear-gradient(145deg, rgba(4, 13, 8, 0.9), rgba(4, 13, 8, 0.95)) !important;"
-        if os.path.exists(bg_path):
-            with open(bg_path, "rb") as f:
-                encoded_bg = base64.b64encode(f.read()).decode()
-                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.5), rgba(4, 13, 8, 0.85)), url('data:image/png;base64,{encoded_bg}') !important;"
-
-        st.markdown(f"""
-            <style>
-            [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] {{
-                height: 290px !important; 
-                {metric_bg_css} 
-                background-size: cover !important; 
-                background-position: center !important;
-                border: 1px solid rgba(212, 175, 55, 0.5) !important;
-                border-radius: 16px !important; 
-                box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
-                transition: all 0.3s ease !important; 
-                display: flex !important; 
-                flex-direction: column !important;
-            }}
-            [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"]:hover {{ 
-                border-color: rgba(212, 175, 55, 1) !important; 
-                transform: translateY(-4px) !important; 
-            }}
-            [data-testid="column"] [data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"] {{ 
-                display: flex !important; 
-                flex-direction: column !important; 
-                height: 100% !important; 
-                justify-content: space-between !important; 
-            }}
-            </style>
-        """, unsafe_allow_html=True)
-
-        # 5. Top Metrics
+        # 4. Top Metrics
         col_rewards, col_odds, col_battle = st.columns(3, gap="medium")
 
         with col_rewards:
@@ -300,7 +279,6 @@ def render_guest_scout():
                 st.subheader("💰 Reward Potential")
                 total_monthly_spend = sum(spends.values()) if spends else 0
                 annual_savings = (total_monthly_spend * 0.03) * 12 
-                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True) 
                 st.metric(label="Total Annual Savings", value=f"₹{int(annual_savings):,}", delta="Optimized Rewards")
 
         with col_odds:
@@ -308,10 +286,9 @@ def render_guest_scout():
                 st.subheader("🎯 Approval Odds")
                 score = data.get('credit', '< 700')
                 odds, status, color = ("35%", "Challenging", "inverse") if score == "< 700" else ("85%", "Strong", "normal")
-                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True)
                 st.metric(label="Likelihood for Top Pick", value=odds, delta=status, delta_color=color)
 
-        # Battleground Popup Definition
+        # 5. Battleground Popup Definition
         @st.dialog("⚔️ Card Battle: Peer-to-Peer Analysis", width="large")
         def battle_popup(entered_card, original_recommendation, user_context):
             st.write(f"### 🏆 Our Top Pick vs. {entered_card}")
@@ -326,62 +303,32 @@ def render_guest_scout():
                 st.subheader("🤖 The Battleground")
                 st.write("Compare cards vs. Our Top pick.")
                 user_card = st.text_input("Enter card name:", key="battle_input")
-                st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True)
                 if st.button("Battle Now", type="primary", use_container_width=True):
                     if user_card:
-                        recommendation_text = st.session_state.get("final_recommendation", "Our top recommended card.")
-                        battle_popup(user_card, recommendation_text, data)
+                        battle_popup(user_card, st.session_state.final_recommendation, data)
 
+        # 6. Render Roadmap
         st.markdown("---")
-
-        # --- 6. SMART CACHING & PROGRESS GENERATION ---
-        current_data_str = json.dumps(data, sort_keys=True, default=str)
-        needs_generation = False
-        
-        if "final_recommendation" not in st.session_state:
-            needs_generation = True
-        elif st.session_state.get("last_data_str") != current_data_str:
-            needs_generation = True
-
-        if needs_generation:
-            with st.status("🤖 AI is analyzing the latest web data for your roadmap...", expanded=True) as status_bar:
-                st.write("Extracting profile metrics...")
-                st.write("Searching for live card offers...")
-                
-                result = generate_card_roadmap(data)
-                
-                if "Error" in result:
-                    status_bar.update(label="❌ Analysis Failed", state="error")
-                    st.error(result)
-                    st.stop()
-                else:
-                    st.session_state.final_recommendation = result
-                    st.session_state.last_data_str = current_data_str
-                    status_bar.update(label="✅ Roadmap Generated!", state="complete", expanded=False)
-
-        # --- 7. RENDER ROADMAP ---
         if "final_recommendation" in st.session_state:
             st.markdown("""
                 <h2 style="color: #F8FAFC; border-left: 5px solid #06B6D4; padding-left: 15px;">Strategic Credit Acquisition Roadmap</h2>
             """, unsafe_allow_html=True)
             st.markdown(st.session_state.final_recommendation)
             
-        # --- 8. EXPORT & SHARE HUB ---
+        # --- EXPORT & SHARE HUB ---
         st.markdown("---")
         from utils.export_tools import generate_pdf_report, get_share_links
         
         c1, c2, c3 = st.columns(3)
         
-        # Reset Button (Clears cache and returns to Step 1)
+        # 1. Reset Button
         if c1.button("Start New Scout", use_container_width=True, icon=":material/refresh:", key="reset_p3"):
             if "final_recommendation" in st.session_state:
                 del st.session_state.final_recommendation
-            if "last_data_str" in st.session_state:
-                del st.session_state.last_data_str
             st.session_state.step = 1
             st.rerun()
 
-        # PDF Download
+        # 2. PDF Download
         if "final_recommendation" in st.session_state:
             pdf_bytes = generate_pdf_report(data.get('name', 'User'), st.session_state.final_recommendation)
             if pdf_bytes:
@@ -395,7 +342,7 @@ def render_guest_scout():
             else:
                 c2.button("⚠️ PDF Error", disabled=True, use_container_width=True)
 
-        # Share Menu
+        # 3. Share Menu
         deploy_url, wa_url, mail_url = get_share_links(data.get('occ', 'Professional'))
         
         with c3.popover("Share link with friends", use_container_width=True, icon=":material/share:"):
