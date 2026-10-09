@@ -438,43 +438,20 @@ def render_guest_scout():
         spends = data.get('spending_categories', {})
 
         # --- 1. TOP LEFT BACK NAVIGATION ---
-        col_back, _ = st.columns([1.5, 8])
-        if col_back.button("⬅️ Back to Edit", type="secondary"):
-            st.session_state.step = 2
-            st.rerun()
+        col_back, col_space = st.columns([2, 8])
+        with col_back:
+            if st.button("⬅️ Edit Profile", type="secondary", use_container_width=True):
+                st.session_state.step = 2
+                st.rerun()
         
-        _, center_column, _ = st.columns([0.5, 3, 0.5])
-        with center_column:
-            st.markdown("""
-                <div style="text-align: center; margin-bottom: 25px; margin-top: -20px;">
-                    <h1 class='scout-title'>
-                        <span style="color: #FFFFFF;">Intelligence </span><span style="color: #34D399;">Hub</span>
-                    </h1>
-                    <p class='scout-subtitle'>YOUR PERSONALIZED ROADMAP.</p>
-                </div>
-            """, unsafe_allow_html=True)
-
-            # --- 2. SMART CACHING (SAVES API CALLS) ---
-            # Create a string signature of the current inputs
-            current_data_str = json.dumps(data, sort_keys=True, default=str)
-
-            # Generate ONLY if there's no report OR if the user changed their inputs
-            if "final_recommendation" not in st.session_state or st.session_state.get("last_data_str") != current_data_str:
-                time.sleep(0.1) 
-                status_container = st.empty()
-                
-                with status_container.status("🔍 Analyzing your financial roadmap...", expanded=True) as status_bar:
-                    result = generate_card_roadmap(data)
-                    
-                    if "Error" in result:
-                        st.error(result)
-                        st.stop()
-                    else:
-                        st.session_state.final_recommendation = result
-                        st.session_state.last_data_str = current_data_str # SAVE INPUT SIGNATURE
-                        status_bar.update(label="✅ Roadmap Generated!", state="complete", expanded=False)
-                        status_container.empty()
-                        st.rerun()
+        st.markdown("""
+            <div style="text-align: center; margin-bottom: 25px; margin-top: -10px;">
+                <h1 class='scout-title'>
+                    <span style="color: #FFFFFF;">Intelligence </span><span style="color: #34D399;">Hub</span>
+                </h1>
+                <p class='scout-subtitle'>YOUR PERSONALIZED ROADMAP.</p>
+            </div>
+        """, unsafe_allow_html=True)
 
         # Sidebar Snapshot
         with st.sidebar:
@@ -491,18 +468,21 @@ def render_guest_scout():
                 st.write(f"**Name:** {data.get('name', 'User')}")
                 st.write(f"**Monthly Income:** ₹{data.get('income', 0):,}")
 
-            if st.button("Edit Profile", type="secondary", use_container_width=True):
+            if st.button("Edit Profile (Sidebar)", type="secondary", use_container_width=True):
                 st.session_state.step = 1
                 st.rerun()
 
-        # --- 3. BULLETPROOF METRIC STYLING ---
-        # Safe gradient fallback just in case the image cannot be found
-        metric_bg_css = "background-image: linear-gradient(145deg, #0A1611, #040D08) !important;"
-        if os.path.exists("card.png"):
-            with open("card.png", "rb") as f:
+        # --- 2. BULLETPROOF METRIC STYLING ---
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        bg_path = os.path.join(root_dir, "card.png")
+        if not os.path.exists(bg_path):
+            bg_path = "card.png"
+
+        metric_bg_css = "background-image: linear-gradient(145deg, rgba(4, 13, 8, 0.9), rgba(4, 13, 8, 0.95)) !important;"
+        if os.path.exists(bg_path):
+            with open(bg_path, "rb") as f:
                 encoded_bg = base64.b64encode(f.read()).decode()
-                # 60% to 90% fade so the image shows clearly behind the text
-                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.6), rgba(4, 13, 8, 0.9)), url('data:image/png;base64,{encoded_bg}') !important;"
+                metric_bg_css = f"background-image: linear-gradient(rgba(4, 13, 8, 0.5), rgba(4, 13, 8, 0.85)), url('data:image/png;base64,{encoded_bg}') !important;"
 
         st.markdown(f"""
             <style>
@@ -512,7 +492,7 @@ def render_guest_scout():
                 {metric_bg_css}
                 background-size: cover !important;
                 background-position: center !important;
-                border: 1px solid rgba(212, 175, 55, 0.6) !important;
+                border: 1px solid rgba(212, 175, 55, 0.5) !important;
                 border-radius: 16px !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
                 transition: all 0.3s ease !important;
@@ -535,7 +515,7 @@ def render_guest_scout():
             </style>
         """, unsafe_allow_html=True)
 
-        # Top Metrics
+        # --- 3. DASHBOARD METRICS ---
         col_rewards, col_odds, col_battle = st.columns(3, gap="medium")
 
         with col_rewards:
@@ -570,25 +550,57 @@ def render_guest_scout():
                 user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed", placeholder="e.g., SBI Cashback")
                 st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True)
                 if st.button("Battle Now", type="primary", use_container_width=True):
+                    # Uses the generated report for comparison
+                    recommendation_text = st.session_state.get("final_recommendation", "Our top recommended card.")
                     if user_card:
-                        battle_popup(user_card, st.session_state.final_recommendation, data)
+                        battle_popup(user_card, recommendation_text, data)
 
-        # Render Roadmap
         st.markdown("---")
+
+        # --- 4. SMART CACHING & PROGRESS GENERATION ---
+        current_data_str = json.dumps(data, sort_keys=True, default=str)
+        needs_generation = False
+        
+        # Trigger generation if it's our first time OR if the user went back and changed a number
+        if "final_recommendation" not in st.session_state:
+            needs_generation = True
+        elif st.session_state.get("last_data_str") != current_data_str:
+            needs_generation = True
+
+        if needs_generation:
+            with st.status("🤖 AI is analyzing the latest web data for your roadmap...", expanded=True) as status_bar:
+                st.write("Extracting profile metrics...")
+                st.write("Searching for live card offers...")
+                
+                result = generate_card_roadmap(data)
+                
+                if "Error" in result:
+                    status_bar.update(label="❌ Analysis Failed", state="error")
+                    st.error(result)
+                    st.stop()
+                else:
+                    # Update session state with the new data
+                    st.session_state.final_recommendation = result
+                    st.session_state.last_data_str = current_data_str
+                    status_bar.update(label="✅ Roadmap Generated!", state="complete", expanded=False)
+                    # Notice we DO NOT use st.rerun() here! 
+                    # The code just continues flowing down to render the roadmap immediately.
+
+        # --- 5. RENDER ROADMAP ---
         if "final_recommendation" in st.session_state:
             st.markdown("""
                 <h2 style="color: #F8FAFC; border-left: 5px solid #34D399; padding-left: 15px;">Strategic Credit Acquisition Roadmap</h2>
             """, unsafe_allow_html=True)
             st.markdown(st.session_state.final_recommendation)
             
-        # --- EXPORT & SHARE HUB ---
+        # --- 6. EXPORT & SHARE HUB ---
         st.markdown("---")
         from utils.export_tools import generate_pdf_report, get_share_links
         
         c1, c2, c3 = st.columns(3)
         
         if c1.button("Start New Scout", type="secondary", use_container_width=True, key="reset_p3"):
-            # 4. HARD RESET: Clears cache and memory when starting entirely over
+            # HARD RESET: Clears cache completely to start over
             if "final_recommendation" in st.session_state:
                 del st.session_state.final_recommendation
             if "last_data_str" in st.session_state:

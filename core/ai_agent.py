@@ -36,13 +36,16 @@ def rotate_key():
 # 1-HOUR CACHE (3600 seconds)
 @st.cache_data(ttl=3600, show_spinner=False)
 def generate_card_roadmap(user_data):
-    """Searches web context and generates recommendations."""
+    """Searches web context and generates recommendations with network resilience."""
     attempts = 0
-    max_attempts = len(KEY_POOL)
+    # Add a couple of extra buffer attempts purely for network drops
+    max_attempts = len(KEY_POOL) + 2 
 
     while attempts < max_attempts:
         try:
             query = f"Best credit cards in India 2026 for {user_data.get('occ', 'professional')} with {user_data.get('income', 50000)} monthly income."
+            
+            # The network drop happens here. The try-except will now catch it.
             web_data = tavily.search(query=query, search_depth="advanced")
             
             prompt = f"""
@@ -63,15 +66,27 @@ def generate_card_roadmap(user_data):
 
         except Exception as e:
             error_message = str(e)
-            if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
+            
+            # 1. Detect if it's a Gemini Quota Error
+            is_quota_error = any(err in error_message for err in ["429", "Quota", "API_KEY_INVALID"])
+            # 2. Detect if it's a Tavily/Network Drop Error
+            is_network_error = any(err in error_message for err in ["Connection", "RemoteDisconnected", "ProtocolError", "Max retries"])
+            
+            if is_quota_error or is_network_error:
                 attempts += 1
-                if rotate_key() and attempts < max_attempts:
+                if attempts < max_attempts:
                     import time
-                    time.sleep(1)
-                    continue
+                    time.sleep(2) # Give the network 2 seconds to recover
+                    
+                    if is_quota_error:
+                        rotate_key() # Only burn a key rotation if it was actually a Gemini quota issue
+                        
+                    continue # Retry the API calls
+            
+            # If it's a completely unknown error, or we ran out of retries
             raise RuntimeError(f"Roadmap Error: {error_message}")
 
-    raise RuntimeError("All configured Gemini API keys have exceeded their current quota.")
+    raise RuntimeError("Generation failed. Network may be down or all API keys are exhausted.")
 
 # 1-HOUR CACHE (3600 seconds)
 @st.cache_data(ttl=3600, show_spinner=False)
