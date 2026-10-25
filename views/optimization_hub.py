@@ -746,7 +746,7 @@ def render_optimization_hub():
                 title_placeholder = st.empty()
                 auth_mode = st.radio("Access Gateway", ["Secure Login", "Create Account"], horizontal=True, label_visibility="collapsed")
                 
-                clean_title = auth_mode.replace('').replace('').strip()
+                clean_title = auth_mode.replace('','').replace('','').strip()
                 title_placeholder.markdown(f"<h3 style='text-align: center; color: #E2E8F0; margin-bottom: 25px;'>{clean_title}</h3>", unsafe_allow_html=True)
                 
                 username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., abc_24", key="login_username")
