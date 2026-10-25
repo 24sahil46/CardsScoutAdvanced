@@ -14,9 +14,9 @@ tavily = TavilyClient(api_key=APP_SETTINGS["TAVILY_API_KEY"])
 # Initialize Gemini Key Pool & Model Fallbacks
 KEY_POOL = APP_SETTINGS["GEMINI_API_KEYS"]
 current_key_index = 0
-MODEL_FALLBACKS = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
+MODEL_FALLBACKS = ['gemini-3.5-flash-lite', 'gemini-3.1-flash-lite']
 
-def get_gemini_model(model_name='gemini-3.8-flash'):
+def get_gemini_model(model_name='gemini-3.5-flash-lite'):
     """Configures and returns the Gemini model using the current active key."""
     global current_key_index
     active_key = KEY_POOL[current_key_index]
