@@ -744,9 +744,9 @@ def render_optimization_hub():
         with center_col:
             with st.container(border=True):
                 title_placeholder = st.empty()
-                auth_mode = st.radio("Access Gateway", ["🟢 Secure Login", "✨ Create Account"], horizontal=True, label_visibility="collapsed")
+                auth_mode = st.radio("Access Gateway", ["Secure Login", "Create Account"], horizontal=True, label_visibility="collapsed")
                 
-                clean_title = auth_mode.replace('🟢', '').replace('✨', '').strip()
+                clean_title = auth_mode.replace('').replace('').strip()
                 title_placeholder.markdown(f"<h3 style='text-align: center; color: #E2E8F0; margin-bottom: 25px;'>{clean_title}</h3>", unsafe_allow_html=True)
                 
                 username = st.text_input("👤 Commander ID (Username)", placeholder="e.g., abc_24", key="login_username")
@@ -767,7 +767,7 @@ def render_optimization_hub():
                 
                 st.markdown("<br>", unsafe_allow_html=True)
                 
-                if auth_mode == "✨ Create Account":
+                if auth_mode == "Create Account":
                     if st.button("🚀 Initialize Commander Profile", type="primary", use_container_width=True):
                         if username and password:
                             if create_user(username, password):
@@ -777,7 +777,7 @@ def render_optimization_hub():
                         else:
                             st.warning("⚠️ Please provide both your Commander ID and Security Clearance.")
                 
-                elif auth_mode == "🟢 Secure Login":
+                elif auth_mode == "Secure Login":
                     if st.button("⚡ Breach The Vault", type="primary", use_container_width=True):
                         if username and password:
                             if verify_user(username, password):
