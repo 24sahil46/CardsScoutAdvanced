@@ -500,16 +500,23 @@ def render_optimization_hub():
                     total_monthly = filtered_df["Monthly (₹)"].sum()
                     annual_spend = total_monthly * 12
                     
+                    # AI YIELD CALCULATION FIXED WITH BUTTON CACHE
                     if selected_filter != "All Cards":
                         services_list = ", ".join(filtered_df["Service"].unique())
-                        with st.spinner(f"AI calculating exact yield for {services_list}..."):
-                            try:
-                                actual_rate = get_utility_cashback_rate(selected_filter, services_list)
-                            except Exception as e:
-                                st.warning(f"⚠️ {str(e)}")
-                                actual_rate = 1.0 # Fallback so the math doesn't crash
+                        cache_key = f"yield_{selected_filter}_{services_list}"
+                        
+                        c_calc, _ = st.columns([1, 2])
+                        if c_calc.button("⚡ Calculate AI Yield", type="primary", use_container_width=True):
+                            with st.spinner(f"AI calculating exact yield for {services_list}..."):
+                                try:
+                                    st.session_state[cache_key] = get_utility_cashback_rate(selected_filter, services_list)
+                                except Exception as e:
+                                    st.warning(f"⚠️ {str(e)}")
+                                    st.session_state[cache_key] = 1.0 
+                                    
+                        actual_rate = st.session_state.get(cache_key, 1.0)
                         est_annual_yield = annual_spend * (actual_rate / 100)
-                        yield_label = f"({actual_rate}% Actual Value-Back)"
+                        yield_label = f"({actual_rate}% Actual Value-Back)" if cache_key in st.session_state else "(~1.0% Base Rate - Click to optimize)"
                     else:
                         est_annual_yield = annual_spend * 0.02 
                         yield_label = "(~2.0% Estimated Mixed Yield)"
