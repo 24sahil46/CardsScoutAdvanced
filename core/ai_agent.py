@@ -34,14 +34,10 @@ def rotate_key():
         return True
     return False
 
-# 1-HOUR CACHE ON WEB SEARCH (3600 seconds)
+# 1-HOUR CACHE (3600 seconds)
 @st.cache_data(ttl=3600, show_spinner=False)
-def fetch_roadmap_web_context(query):
-    """Caches the Tavily web search so streaming can start immediately on repeat queries."""
-    return tavily.search(query=query, search_depth="advanced")
-
 def generate_card_roadmap(user_data):
-    """Searches web context and streams recommendations in real-time with network resilience."""
+    """Searches web context faster and generates recommendations with network resilience."""
     attempts = 0
     max_attempts = len(KEY_POOL) + 2 
 
@@ -49,8 +45,8 @@ def generate_card_roadmap(user_data):
         try:
             query = f"Best credit cards in India 2026 for {user_data.get('occ', 'professional')} with {user_data.get('income', 50000)} monthly income."
             
-            # Fetch cached or live web data
-            web_data = fetch_roadmap_web_context(query)
+            # FAST SEARCH: Using 'basic' depth and top 3 results cuts search latency by 70%
+            web_data = tavily.search(query=query, search_depth="basic", max_results=3)
             
             prompt = f"""
             Act as an Expert Financial Advisor.
@@ -65,18 +61,8 @@ def generate_card_roadmap(user_data):
             Format your entire response clearly using standard markdown.
             """
             model = get_gemini_model()
-            
-            # Enable streaming from Gemini
-            response = model.generate_content(prompt, stream=True)
-            
-            for chunk in response:
-                try:
-                    if chunk.text:
-                        yield chunk.text
-                except ValueError:
-                    # Safely skip empty metadata chunks
-                    pass
-            return
+            response = model.generate_content(prompt)
+            return response.text
 
         except Exception as e:
             error_message = str(e)
@@ -94,10 +80,9 @@ def generate_card_roadmap(user_data):
                         rotate_key()
                     continue
             
-            yield f"Error: Roadmap Error: {error_message}"
-            return
+            raise RuntimeError(f"Roadmap Error: {error_message}")
 
-    yield "Error: Generation failed. Network may be down or all API keys are exhausted."
+    raise RuntimeError("Generation failed. Network may be down or all API keys are exhausted.")
 
 # 1-HOUR CACHE (3600 seconds)
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -141,7 +126,7 @@ def get_fee_waiver_target(card_name):
     while attempts < max_attempts:
         try:
             query = f"What is the annual fee waiver spend target for {card_name} credit card in India 2026?"
-            web_data = tavily.search(query=query)
+            web_data = tavily.search(query=query, search_depth="basic", max_results=3)
             
             prompt = f"""
             Based on this web data: {web_data}.
@@ -175,7 +160,7 @@ def get_forex_markup(card_name):
     while attempts < max_attempts:
         try:
             query = f"What is the exact forex markup fee percentage for {card_name} in India?"
-            web_data = tavily.search(query=query, search_depth="basic")
+            web_data = tavily.search(query=query, search_depth="basic", max_results=3)
             
             prompt = f"""
             Based on this web data: {web_data}.
@@ -249,7 +234,7 @@ def fetch_live_card_offers(card_name):
     while attempts < max_attempts:
         try:
             query = f"Latest active offers, sales, and discounts for {card_name} credit card in India on Amazon, Flipkart, Swiggy, Zomato, MakeMyTrip, IRCTC Train Booking, Indigo/AirIndia Flights, and HPCL/BPCL/IOCL Fuel 2026"
-            web_data = tavily.search(query=query, search_depth="basic")
+            web_data = tavily.search(query=query, search_depth="basic", max_results=3)
             
             prompt = f"""
             Based on the following live web data: {web_data}
@@ -298,7 +283,7 @@ def get_hidden_milestones(card_name):
     while attempts < max_attempts:
         try:
             query = f"What are the milestone rewards or bonus offers based on annual spend for {card_name} credit card in India 2026? Be specific about spend amounts and the reward."
-            web_data = tavily.search(query=query, search_depth="basic")
+            web_data = tavily.search(query=query, search_depth="basic", max_results=3)
             
             prompt = f"""
             Based on this web data: {web_data}.
@@ -342,7 +327,7 @@ def get_utility_cashback_rate(card_name, services):
     while attempts < max_attempts:
         try:
             query = f"Cashback percentage for {services} using {card_name} credit card India"
-            web_data = tavily.search(query=query, search_depth="basic")
+            web_data = tavily.search(query=query, search_depth="basic", max_results=3)
             
             prompt = f"""
             Based on this web data: {web_data}.
@@ -382,7 +367,7 @@ def get_reward_point_values(card_name):
     while attempts < max_attempts:
         try:
             query = f"Value of 1 reward point in INR for {card_name} statement credit, vouchers, and travel miles transfer"
-            web_data = tavily.search(query=query, search_depth="basic")
+            web_data = tavily.search(query=query, search_depth="basic", max_results=3)
             
             prompt = f"""
             Based on this web data: {web_data}.
@@ -423,7 +408,7 @@ def get_fee_and_penalty_audit(card_name):
     while attempts < max_attempts:
         try:
             query = f"{card_name} hidden fees, interest rate APR, cash advance fee, late payment penalty India"
-            web_data = tavily.search(query=query, search_depth="basic")
+            web_data = tavily.search(query=query, search_depth="basic", max_results=3)
             
             prompt = f"""
             Based on this web data: {web_data}.

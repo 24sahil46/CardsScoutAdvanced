@@ -332,17 +332,45 @@ def render_step_2():
                     "existing_card": current_card_name, "reward_type": reward_type, "pref": pref
                 })
                 
-                # Check if user data changed; if so, clear old recommendation so Step 3 streams fresh text
+                # --- SMART CACHE LOGIC & ROUTING TO LOADING SCREEN ---
                 current_data_str = json.dumps(st.session_state.user_data, sort_keys=True, default=str)
-                if st.session_state.get("last_data_str") != current_data_str:
-                    if "final_recommendation" in st.session_state:
-                        del st.session_state.final_recommendation
-                    st.session_state.last_data_str = current_data_str
                 
-                # Jump directly to Step 3 for live streaming
-                st.session_state.step = 3
+                if "final_recommendation" in st.session_state and st.session_state.get("last_data_str") == current_data_str:
+                    # Data didn't change! Skip loading screen
+                    st.session_state.step = 3
+                else:
+                    # New or changed data -> Go to Loading Screen
+                    st.session_state.last_data_str = current_data_str
+                    st.session_state.step = "loading"
+                    
                 st.rerun()
 
+def render_step_loading():
+    """Dedicated Loading Page to prevent UI overlaps."""
+    st.markdown("<br><br><br><br>", unsafe_allow_html=True)
+    _, center, _ = st.columns([1, 2, 1])
+    
+    with center:
+        st.markdown("""
+            <div style='text-align: center; background: rgba(0,0,0,0.6); padding: 40px; border-radius: 16px; border: 1px solid rgba(52, 211, 153, 0.3); box-shadow: 0 10px 40px rgba(0,0,0,0.8);'>
+                <h2 style='color: #34D399; margin-bottom: 10px;'>🔍 Analyzing your financial roadmap...</h2>
+                <p style='color: #94A3B8; font-size: 1.1rem;'>Our AI is scanning millions of data points to find your perfect match. Please wait.</p>
+            </div>
+            <br>
+        """, unsafe_allow_html=True)
+        
+        with st.spinner("Processing Web Data & Yield Calculations..."):
+            result = generate_card_roadmap(st.session_state.user_data)
+            
+            if "Error" in result:
+                st.error(result)
+                if st.button("Try Again", type="secondary"):
+                    st.session_state.step = 2
+                    st.rerun()
+            else:
+                st.session_state.final_recommendation = result
+                st.session_state.step = 3
+                st.rerun()
 
 def render_step_3():
     data = st.session_state.user_data
@@ -445,22 +473,11 @@ def render_step_3():
 
     st.markdown("---")
 
-    # Live Streaming or Cached Roadmap Display
-    st.markdown("""
-        <h2 style="color: #F8FAFC; border-left: 5px solid #34D399; padding-left: 15px;">Strategic Credit Acquisition Roadmap</h2>
-    """, unsafe_allow_html=True)
-
-    if "final_recommendation" not in st.session_state:
-        with st.spinner("🔍 Scanning live web data & initializing AI stream..."):
-            streamed_text = st.write_stream(generate_card_roadmap(data))
-            
-        if isinstance(streamed_text, str) and streamed_text.startswith("Error:"):
-            st.error(streamed_text)
-            if st.button("🔄 Retry Generation", type="secondary"):
-                st.rerun()
-        else:
-            st.session_state.final_recommendation = streamed_text
-    else:
+    # Render Roadmap
+    if "final_recommendation" in st.session_state:
+        st.markdown("""
+            <h2 style="color: #F8FAFC; border-left: 5px solid #34D399; padding-left: 15px;">Strategic Credit Acquisition Roadmap</h2>
+        """, unsafe_allow_html=True)
         st.markdown(st.session_state.final_recommendation)
         
     # Export & Share Hub
@@ -511,5 +528,7 @@ def render_guest_scout():
         render_step_1()
     elif current_step == 2:
         render_step_2()
+    elif current_step == "loading":
+        render_step_loading()
     elif current_step == 3:
         render_step_3()
