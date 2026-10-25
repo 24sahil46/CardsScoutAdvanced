@@ -316,7 +316,7 @@ if st.session_state.current_page == "Home":
                         align-items: center;
                         text-align: center;
                     ">
-                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC !important; text-shadow: 0 2px 6px rgba(0,0,0,1);'>🧭 Guest Scout</h3>
+                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC !important; text-shadow: 0 2px 6px rgba(0,0,0,1);'>Guest Scout</h3>
                         <div style='color: #E2E8F0 !important; font-size: 0.95rem; line-height: 1.5; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,1);'>Analyze your expenditure profile to discover your highest-yielding credit card match.</div>
                     </div>
                 </div>
@@ -356,7 +356,7 @@ if st.session_state.current_page == "Home":
                         align-items: center;
                         text-align: center;
                     ">
-                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC !important; text-shadow: 0 2px 6px rgba(0,0,0,1);'>💎 The Obsidian Vault</h3>
+                        <h3 style='margin:0 0 8px 0; font-size: 1.4rem; font-weight: 700; color: #F8FAFC !important; text-shadow: 0 2px 6px rgba(0,0,0,1);'>The Obsidian Vault</h3>
                         <div style='color: #E2E8F0 !important; font-size: 0.95rem; line-height: 1.5; margin: 0; text-shadow: 0 2px 6px rgba(0,0,0,1);'>Access your secure portfolio to track rewards, monitor yields, and optimize benefits.</div>
                     </div>
                 </div>
