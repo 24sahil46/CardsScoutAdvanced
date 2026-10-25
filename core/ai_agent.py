@@ -2,6 +2,7 @@
 import os
 import json
 import re
+import time
 import streamlit as st
 import google.generativeai as genai
 from tavily import TavilyClient
@@ -33,20 +34,23 @@ def rotate_key():
         return True
     return False
 
-# 1-HOUR CACHE (3600 seconds)
+# 1-HOUR CACHE ON WEB SEARCH (3600 seconds)
 @st.cache_data(ttl=3600, show_spinner=False)
+def fetch_roadmap_web_context(query):
+    """Caches the Tavily web search so streaming can start immediately on repeat queries."""
+    return tavily.search(query=query, search_depth="advanced")
+
 def generate_card_roadmap(user_data):
-    """Searches web context and generates recommendations with network resilience."""
+    """Searches web context and streams recommendations in real-time with network resilience."""
     attempts = 0
-    # Add a couple of extra buffer attempts purely for network drops
     max_attempts = len(KEY_POOL) + 2 
 
     while attempts < max_attempts:
         try:
             query = f"Best credit cards in India 2026 for {user_data.get('occ', 'professional')} with {user_data.get('income', 50000)} monthly income."
             
-            # The network drop happens here. The try-except will now catch it.
-            web_data = tavily.search(query=query, search_depth="advanced")
+            # Fetch cached or live web data
+            web_data = fetch_roadmap_web_context(query)
             
             prompt = f"""
             Act as an Expert Financial Advisor.
@@ -61,8 +65,18 @@ def generate_card_roadmap(user_data):
             Format your entire response clearly using standard markdown.
             """
             model = get_gemini_model()
-            response = model.generate_content(prompt)
-            return response.text
+            
+            # Enable streaming from Gemini
+            response = model.generate_content(prompt, stream=True)
+            
+            for chunk in response:
+                try:
+                    if chunk.text:
+                        yield chunk.text
+                except ValueError:
+                    # Safely skip empty metadata chunks
+                    pass
+            return
 
         except Exception as e:
             error_message = str(e)
@@ -75,18 +89,15 @@ def generate_card_roadmap(user_data):
             if is_quota_error or is_network_error:
                 attempts += 1
                 if attempts < max_attempts:
-                    import time
-                    time.sleep(2) # Give the network 2 seconds to recover
-                    
+                    time.sleep(2)
                     if is_quota_error:
-                        rotate_key() # Only burn a key rotation if it was actually a Gemini quota issue
-                        
-                    continue # Retry the API calls
+                        rotate_key()
+                    continue
             
-            # If it's a completely unknown error, or we ran out of retries
-            raise RuntimeError(f"Roadmap Error: {error_message}")
+            yield f"Error: Roadmap Error: {error_message}"
+            return
 
-    raise RuntimeError("Generation failed. Network may be down or all API keys are exhausted.")
+    yield "Error: Generation failed. Network may be down or all API keys are exhausted."
 
 # 1-HOUR CACHE (3600 seconds)
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -114,7 +125,6 @@ def generate_battle_analysis(entered_card, original_recommendation, user_data):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
-                    import time
                     time.sleep(1)
                     continue
             raise RuntimeError(f"Battle Analysis Error: {error_message}")
@@ -149,7 +159,6 @@ def get_fee_waiver_target(card_name):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
-                    import time
                     time.sleep(1)
                     continue
             raise RuntimeError(f"Waiver Target Error: {error_message}")
@@ -188,7 +197,6 @@ def get_forex_markup(card_name):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
-                    import time
                     time.sleep(1)
                     continue
             raise RuntimeError(f"Forex fetch error: {error_message}")
@@ -226,14 +234,13 @@ def get_copilot_verdict(query, wallet_context):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
-                    import time
                     time.sleep(1)
                     continue
             raise RuntimeError(f"Copilot Error: {error_message}")
 
     raise RuntimeError("All API keys are currently rate-limited.")
 
-@st.cache_data(ttl=899, show_spinner=False) # Changed from 900 to 899
+@st.cache_data(ttl=899, show_spinner=False)
 def fetch_live_card_offers(card_name):
     """Searches the web for live discounts and renders them as UI Coupon Cards."""
     attempts = 0
@@ -275,7 +282,6 @@ def fetch_live_card_offers(card_name):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
-                    import time
                     time.sleep(1)
                     continue
             raise RuntimeError(f"Error fetching offers: {error_message}")
@@ -320,7 +326,6 @@ def get_hidden_milestones(card_name):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
-                    import time
                     time.sleep(1)
                     continue
             raise RuntimeError(f"Error fetching milestones: {error_message}")
@@ -361,7 +366,6 @@ def get_utility_cashback_rate(card_name, services):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
-                    import time
                     time.sleep(1)
                     continue
             raise RuntimeError(f"Utility Rate Error: {error_message}")
@@ -403,7 +407,6 @@ def get_reward_point_values(card_name):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
-                    import time
                     time.sleep(1)
                     continue
             raise RuntimeError(f"Point Valuation Error: {error_message}")
@@ -447,7 +450,6 @@ def get_fee_and_penalty_audit(card_name):
             if "429" in error_message or "Quota" in error_message or "API_KEY_INVALID" in error_message:
                 attempts += 1
                 if rotate_key() and attempts < max_attempts:
-                    import time
                     time.sleep(1)
                     continue
             raise RuntimeError(f"Audit Error: {error_message}")
