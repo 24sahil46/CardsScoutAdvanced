@@ -193,7 +193,7 @@ with nav_copilot:
                 
                 from core.ai_agent import get_copilot_verdict
                 with st.spinner("Analyzing yield..."):
-                    advice = get_copilot_verdict(user_query, active_wallet, active_limits)
+                    advice = get_copilot_verdict(user_query, active_limits)
                     st.session_state.copilot_messages.append({"role": "assistant", "content": advice})
                 st.rerun()
 
