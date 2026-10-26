@@ -182,7 +182,8 @@ with nav_copilot:
                 st.session_state.copilot_messages = []
 
             for msg in st.session_state.copilot_messages[-4:]:
-                with st.chat_message(msg["role"]):
+                custom_avatar = "👤" if msg["role"] == "user" else "🤖"
+                with st.chat_message(msg["role"], avatar=custom_avatar):
                     st.markdown(msg["content"])
 
             user_query = st.chat_input("Ask Co-Pilot...", key="top_copilot_input")
