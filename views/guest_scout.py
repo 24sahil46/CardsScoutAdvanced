@@ -462,7 +462,7 @@ def render_step_3():
 
     with col_battle:
         with st.container(border=True):
-            st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>🤖 The Battleground</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='color: #F8FAFC; font-size: 1.1rem; margin-bottom: 5px;'>⚔️ The Battleground</h3>", unsafe_allow_html=True)
             st.write("Compare cards vs. Our Top pick.")
             user_card = st.text_input("Enter card name:", key="battle_input", label_visibility="collapsed", placeholder="e.g., SBI Cashback")
             st.markdown("<div style='flex-grow: 1;'></div>", unsafe_allow_html=True)
